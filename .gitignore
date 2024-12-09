@@ -33,3 +33,4 @@ template
 .eslintcache
 
 config.json
+.vercel
