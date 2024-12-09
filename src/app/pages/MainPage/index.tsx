@@ -158,12 +158,12 @@ export function MainPage() {
     getStaticData();
     getDynamicData();
 
-    const interval = setInterval(() => {
-      getDynamicData();
-    }, UPDATE_TIME_INTERVAL);
-    return () => {
-      clearInterval(interval);
-    };
+    // const interval = setInterval(() => {
+    //   getDynamicData();
+    // }, UPDATE_TIME_INTERVAL);
+    // return () => {
+    //   clearInterval(interval);
+    // };
   }, [dispatch, getDynamicData]);
 
   useEffect(() => {
