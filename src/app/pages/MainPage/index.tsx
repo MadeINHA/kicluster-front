@@ -1,11 +1,4 @@
-import { config } from 'config';
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useDispatch, useSelector } from 'react-redux';
 import { areaActions } from 'slices/area';
@@ -18,16 +11,14 @@ import { kickBoardActions } from 'slices/kickBoard';
 import { selectKickBoards } from 'slices/kickBoard/selectors';
 import styled from 'styled-components/macro';
 import { motion } from 'motion/react';
+import useMap from 'hooks/useMap';
+import useData from 'hooks/useData';
+import useRecommendedAreas from 'hooks/useRecommendedAreas';
+import useProhibitedAreas from 'hooks/useProhibitedAreas';
+import useExistingAreas from 'hooks/useExistingAreas';
 
 const UPDATE_TIME_INTERVAL = 30000;
 const KICK_BOARD_MARKER_BG_COLOR = '#6a26ff';
-
-const naverMapsOptions: naver.maps.MapOptions = {
-  center: { lat: 37.4507292, lng: 126.6538126 },
-  scaleControl: false,
-  logoControl: false,
-  mapDataControl: false,
-};
 
 const Map = styled.div`
   width: 100%;
@@ -77,231 +68,82 @@ const IconButton = styled(Button)`
 // `;
 
 export function MainPage() {
-  const dispatch = useDispatch();
+  const { getDynamicData } = useData();
 
   const kickBoards = useSelector(selectKickBoards);
-  const recommendedAreas = useSelector(selectRecommendedAreas);
-  const prohibitedAreas = useSelector(selectProhibitedAreas);
-  const existingAreas = useSelector(selectExistingAreas);
 
-  const mapRef = useRef<null | naver.maps.Map>(null);
   const kickBoardMarkersRef = useRef<null | naver.maps.Marker[]>(null);
-  const myLocationMarkerRef = useRef<null | naver.maps.Marker>(null);
 
   const [isKickBoardVisible] = useState(true);
 
-  const goToMyLocation = () => {
-    navigator.geolocation.getCurrentPosition(geolocationPosition => {
-      if (!mapRef.current) return;
-      const position = {
-        lat: geolocationPosition.coords.latitude,
-        lng: geolocationPosition.coords.longitude,
-      };
-      mapRef.current?.setCenter(position);
-    });
-  };
-
-  const getDynamicData = useCallback(() => {
-    dispatch(kickBoardActions.getKickBoards());
-    dispatch(areaActions.getRecommendedAreas());
-  }, [dispatch]);
-
-  // Load Naver Maps & Create a Map & The Map Settings
-  useLayoutEffect(() => {
-    if (!document.getElementById('naverMapsScript')) {
-      const naverMapsScript = document.createElement('script');
-      naverMapsScript.id = 'naverMapsScript';
-      naverMapsScript.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${config.naverMapsApiKey}`;
-      naverMapsScript.onload = () => {
-        const markerClusteringScript = document.createElement('script');
-        markerClusteringScript.id = 'markerClusteringScript';
-        markerClusteringScript.src = '/markerClustering.js';
-        document.head.appendChild(markerClusteringScript);
-        markerClusteringScript.onload = () => {
-          const map = new naver.maps.Map('map', naverMapsOptions);
-          mapRef.current = map;
-          myLocationMarkerRef.current = new naver.maps.Marker({
-            position: { lat: 37.4507292, lng: 126.6538126 },
-            map,
-            icon: {
-              content:
-                '<div style="display: flex;align-items: center;justify-content: center;width: 36px;height: 36px;background-color: #6a26ff40;border-radius: 50%;"><div style="width: 16px;height: 16px;background-color: #6a26ff;border: 2px solid #ffffff;border-radius: 50%;box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.16)"></div></div>',
-              size: new naver.maps.Size(36, 36),
-              anchor: new naver.maps.Point(18, 18),
-            },
-          });
-        };
-      };
-      document.head.appendChild(naverMapsScript);
-    }
-  }, []);
+  const { mapRef, goToMyLocation } = useMap();
+  useRecommendedAreas(mapRef);
+  useProhibitedAreas(mapRef);
+  useExistingAreas(mapRef);
 
   useEffect(() => {
-    const watchId = navigator.geolocation.watchPosition(geolocationPosition => {
-      const position = {
-        lat: geolocationPosition.coords.latitude,
-        lng: geolocationPosition.coords.longitude,
-      };
-      myLocationMarkerRef.current?.setPosition(position);
-    });
-    return () => {
-      navigator.geolocation.clearWatch(watchId);
-    };
-  }, []);
-
-  useEffect(() => {
-    const getStaticData = () => {
-      dispatch(areaActions.getProhibitedAreas());
-      dispatch(areaActions.getExistingAreas());
-    };
-
-    getStaticData();
-    getDynamicData();
-
-    // const interval = setInterval(() => {
-    //   getDynamicData();
-    // }, UPDATE_TIME_INTERVAL);
-    // return () => {
-    //   clearInterval(interval);
-    // };
-  }, [dispatch, getDynamicData]);
-
-  useEffect(() => {
-    if (kickBoards) {
-      kickBoardMarkersRef.current = kickBoards.map(
-        kickBoard =>
-          new naver.maps.Marker({
-            position: {
-              lat: kickBoard.lat,
-              lng: kickBoard.lng,
-            },
-            map: mapRef.current ?? undefined,
-            icon: {
-              content: `<div data-id="${kickBoard.kickboardId}" data-lat="${
-                kickBoard.lat
-              }" data-lng="${
-                kickBoard.lng
-              }" style="display: flex;justify-content: center;width: 56px;height: 56px;"><svg style="width: 100%;" viewBox="0 0 128 151" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="64" cy="64" r="64" fill="${
-                kickBoard.parkingZone === 1
-                  ? '#ff0000'
-                  : kickBoard.clusterId === -1
-                  ? KICK_BOARD_MARKER_BG_COLOR
-                  : '#00c000'
-              }"/><path d="M64 151L91.7128 103H36.2872L64 151Z" fill="${
-                kickBoard.parkingZone === 1
-                  ? '#ff0000'
-                  : kickBoard.clusterId === -1
-                  ? KICK_BOARD_MARKER_BG_COLOR
-                  : '#00c000'
-              }"/><path d="M38.9167 85.5C37.9014 85.5 37.0504 85.1566 36.3635 84.4698C35.6767 83.783 35.3333 82.9319 35.3333 81.9167C35.3333 80.9014 35.6767 80.0503 36.3635 79.3635C37.0504 78.6767 37.9014 78.3333 38.9167 78.3333C39.9319 78.3333 40.783 78.6767 41.4698 79.3635C42.1566 80.0503 42.5 80.9014 42.5 81.9167C42.5 82.9319 42.1566 83.783 41.4698 84.4698C40.783 85.1566 39.9319 85.5 38.9167 85.5ZM38.9167 92.6667C41.9028 92.6667 44.441 91.6215 46.5313 89.5313C48.6215 87.441 49.6667 84.9028 49.6667 81.9167C49.6667 78.9306 48.6215 76.3924 46.5313 74.3021C44.441 72.2118 41.9028 71.1667 38.9167 71.1667C35.9306 71.1667 33.3924 72.2118 31.3021 74.3021C29.2118 76.3924 28.1667 78.9306 28.1667 81.9167C28.1667 84.9028 29.2118 87.441 31.3021 89.5313C33.3924 91.6215 35.9306 92.6667 38.9167 92.6667ZM89.0833 85.5C88.0681 85.5 87.217 85.1566 86.5302 84.4698C85.8434 83.783 85.5 82.9319 85.5 81.9167C85.5 80.9014 85.8434 80.0503 86.5302 79.3635C87.217 78.6767 88.0681 78.3333 89.0833 78.3333C90.0986 78.3333 90.9497 78.6767 91.6365 79.3635C92.3233 80.0503 92.6667 80.9014 92.6667 81.9167C92.6667 82.9319 92.3233 83.783 91.6365 84.4698C90.9497 85.1566 90.0986 85.5 89.0833 85.5ZM89.0833 92.6667C92.0694 92.6667 94.6076 91.6215 96.6979 89.5313C98.7882 87.441 99.8333 84.9028 99.8333 81.9167C99.8333 78.9306 98.7882 76.3924 96.6979 74.3021C94.6076 72.2118 92.0694 71.1667 89.0833 71.1667C86.8139 71.1667 84.7535 71.8236 82.9021 73.1375C81.0507 74.4514 79.7368 76.1833 78.9604 78.3333H60.0583C59.4014 74.2125 57.7142 70.6441 54.9969 67.6281C52.2795 64.6122 48.95 62.5069 45.0083 61.3125L50.025 38.9167H64V31.75H50.025C48.3528 31.75 46.8597 32.2576 45.5458 33.2729C44.2319 34.2882 43.3958 35.6319 43.0375 37.3042L36.2292 67.5833H38.9167C42.8583 67.5833 46.2326 68.9868 49.0396 71.7938C51.8465 74.6007 53.25 77.975 53.25 81.9167V85.5H78.9604C79.7368 87.65 81.0507 89.3819 82.9021 90.6958C84.7535 92.0097 86.8139 92.6667 89.0833 92.6667Z" fill="white"/></svg></div>`,
-              size: new naver.maps.Size(56, 56),
-              anchor: new naver.maps.Point(28, 56),
-            },
-            visible: isKickBoardVisible,
-          }),
-      );
-
-      var markers = kickBoardMarkersRef.current; // Array
-
-      var htmlMarker1 = {
-        content: `<div style="display: flex;justify-content: center;position: relative;width: 56px;height: 56px;"><div style="position: absolute;color: #ffffff;top: 10px;"></div><svg style="width: 100%;" viewBox="0 0 128 151" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="64" cy="64" r="64" fill="#a277ff"/><path d="M64 151L91.7128 103H36.2872L64 151Z" fill="#a277ff"/></svg></div>`,
-        size: new naver.maps.Size(56, 56),
-        anchor: new naver.maps.Point(28, 56),
-      };
-
-      new MarkerClustering({
-        minClusterSize: 2,
-        maxZoom: 19,
-        map: mapRef.current,
-        markers: markers,
-        disableClickZoom: false,
-        icons: [htmlMarker1],
-        indexGenerator: [10, 20, 50, 100, 1000],
-        stylingFunction: function (clusterMarker, count) {
-          clusterMarker
-            .getElement()
-            .querySelector('div:first-child > div').innerText = count;
-        },
-      });
-    }
-    return () => {
+    const clearEffect = () => {
       kickBoardMarkersRef.current?.forEach(marker => {
         marker.setMap(null);
       });
     };
-  }, [kickBoards, isKickBoardVisible]);
 
-  useEffect(() => {
-    let recommendedAreasPolygons: undefined | naver.maps.Polygon[];
-    if (recommendedAreas) {
-      recommendedAreasPolygons = recommendedAreas.map(
-        ({ kickboard_list }) =>
-          new naver.maps.Polygon({
-            paths: [kickboard_list],
-            map: mapRef.current ?? undefined,
-            fillColor: '#00c000',
-            fillOpacity: 0.2,
-            strokeColor: '#00c000',
-            strokeWeight: 3,
-            strokeLineJoin: 'round',
-            strokeOpacity: 0.5,
-          }),
-      );
-    }
-    return () => {
-      recommendedAreasPolygons?.forEach(polygon => {
-        polygon.setMap(null);
-      });
-    };
-  }, [recommendedAreas]);
+    if (!kickBoards) return clearEffect;
 
-  useEffect(() => {
-    let prohibitedAreasPolygons: undefined | naver.maps.Polygon[];
-    if (prohibitedAreas) {
-      prohibitedAreasPolygons = prohibitedAreas.map(
-        ({ path }) =>
-          new naver.maps.Polygon({
-            paths: [path],
-            map: mapRef.current ?? undefined,
-            fillColor: '#c00000',
-            fillOpacity: 0.2,
-            strokeColor: '#c00000',
-            strokeWeight: 3,
-            strokeLineJoin: 'round',
-            strokeOpacity: 0.5,
-          }),
-      );
-    }
-    return () => {
-      prohibitedAreasPolygons?.forEach(polygon => {
-        polygon.setMap(null);
+    kickBoardMarkersRef.current = kickBoards.map(kickBoard => {
+      const marker = new naver.maps.Marker({
+        position: {
+          lat: kickBoard.lat,
+          lng: kickBoard.lng,
+        },
+        map: mapRef.current ?? undefined,
+        icon: {
+          content: `<div style="display: flex;justify-content: center;width: 56px;height: 56px;"><svg style="width: 100%;" viewBox="0 0 128 151" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="64" cy="64" r="64" fill="${
+            kickBoard.parkingZone === 1
+              ? '#ff0000'
+              : kickBoard.clusterId === -1
+              ? KICK_BOARD_MARKER_BG_COLOR
+              : '#00c000'
+          }"/><path d="M64 151L91.7128 103H36.2872L64 151Z" fill="${
+            kickBoard.parkingZone === 1
+              ? '#ff0000'
+              : kickBoard.clusterId === -1
+              ? KICK_BOARD_MARKER_BG_COLOR
+              : '#00c000'
+          }"/><path d="M38.9167 85.5C37.9014 85.5 37.0504 85.1566 36.3635 84.4698C35.6767 83.783 35.3333 82.9319 35.3333 81.9167C35.3333 80.9014 35.6767 80.0503 36.3635 79.3635C37.0504 78.6767 37.9014 78.3333 38.9167 78.3333C39.9319 78.3333 40.783 78.6767 41.4698 79.3635C42.1566 80.0503 42.5 80.9014 42.5 81.9167C42.5 82.9319 42.1566 83.783 41.4698 84.4698C40.783 85.1566 39.9319 85.5 38.9167 85.5ZM38.9167 92.6667C41.9028 92.6667 44.441 91.6215 46.5313 89.5313C48.6215 87.441 49.6667 84.9028 49.6667 81.9167C49.6667 78.9306 48.6215 76.3924 46.5313 74.3021C44.441 72.2118 41.9028 71.1667 38.9167 71.1667C35.9306 71.1667 33.3924 72.2118 31.3021 74.3021C29.2118 76.3924 28.1667 78.9306 28.1667 81.9167C28.1667 84.9028 29.2118 87.441 31.3021 89.5313C33.3924 91.6215 35.9306 92.6667 38.9167 92.6667ZM89.0833 85.5C88.0681 85.5 87.217 85.1566 86.5302 84.4698C85.8434 83.783 85.5 82.9319 85.5 81.9167C85.5 80.9014 85.8434 80.0503 86.5302 79.3635C87.217 78.6767 88.0681 78.3333 89.0833 78.3333C90.0986 78.3333 90.9497 78.6767 91.6365 79.3635C92.3233 80.0503 92.6667 80.9014 92.6667 81.9167C92.6667 82.9319 92.3233 83.783 91.6365 84.4698C90.9497 85.1566 90.0986 85.5 89.0833 85.5ZM89.0833 92.6667C92.0694 92.6667 94.6076 91.6215 96.6979 89.5313C98.7882 87.441 99.8333 84.9028 99.8333 81.9167C99.8333 78.9306 98.7882 76.3924 96.6979 74.3021C94.6076 72.2118 92.0694 71.1667 89.0833 71.1667C86.8139 71.1667 84.7535 71.8236 82.9021 73.1375C81.0507 74.4514 79.7368 76.1833 78.9604 78.3333H60.0583C59.4014 74.2125 57.7142 70.6441 54.9969 67.6281C52.2795 64.6122 48.95 62.5069 45.0083 61.3125L50.025 38.9167H64V31.75H50.025C48.3528 31.75 46.8597 32.2576 45.5458 33.2729C44.2319 34.2882 43.3958 35.6319 43.0375 37.3042L36.2292 67.5833H38.9167C42.8583 67.5833 46.2326 68.9868 49.0396 71.7938C51.8465 74.6007 53.25 77.975 53.25 81.9167V85.5H78.9604C79.7368 87.65 81.0507 89.3819 82.9021 90.6958C84.7535 92.0097 86.8139 92.6667 89.0833 92.6667Z" fill="white"/></svg></div>`,
+          size: new naver.maps.Size(56, 56),
+          anchor: new naver.maps.Point(28, 56),
+        },
+        visible: isKickBoardVisible,
       });
-    };
-  }, [prohibitedAreas]);
+      return marker;
+    });
 
-  useEffect(() => {
-    let existingAreasPolygons: undefined | naver.maps.Polygon[];
-    if (existingAreas) {
-      existingAreasPolygons = existingAreas.map(
-        ({ path }) =>
-          new naver.maps.Polygon({
-            paths: [path],
-            map: mapRef.current ?? undefined,
-            fillColor: '#0000c0',
-            fillOpacity: 0.2,
-            strokeColor: '#0000c0',
-            strokeWeight: 3,
-            strokeLineJoin: 'round',
-            strokeOpacity: 0.5,
-          }),
-      );
-    }
-    return () => {
-      existingAreasPolygons?.forEach(polygon => {
-        polygon.setMap(null);
-      });
+    var markers = kickBoardMarkersRef.current; // Array
+
+    var htmlMarker1 = {
+      content: `<div style="display: flex;justify-content: center;position: relative;width: 56px;height: 56px;"><div style="position: absolute;color: #ffffff;top: 10px;"></div><svg style="width: 100%;" viewBox="0 0 128 151" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="64" cy="64" r="64" fill="#a277ff"/><path d="M64 151L91.7128 103H36.2872L64 151Z" fill="#a277ff"/></svg></div>`,
+      size: new naver.maps.Size(56, 56),
+      anchor: new naver.maps.Point(28, 56),
     };
-  }, [existingAreas]);
+
+    new MarkerClustering({
+      minClusterSize: 2,
+      maxZoom: 19,
+      map: mapRef.current,
+      markers: markers,
+      disableClickZoom: false,
+      icons: [htmlMarker1],
+      indexGenerator: [10, 20, 50, 100, 1000],
+      stylingFunction: function (clusterMarker, count) {
+        clusterMarker
+          .getElement()
+          .querySelector('div:first-child > div').innerText = count;
+      },
+    });
+
+    return clearEffect;
+  }, [kickBoards, isKickBoardVisible, mapRef]);
 
   return (
     <>
