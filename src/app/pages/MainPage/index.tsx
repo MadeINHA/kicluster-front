@@ -20,53 +20,6 @@ import useExistingAreas from 'hooks/useExistingAreas';
 const UPDATE_TIME_INTERVAL = 30000;
 const KICK_BOARD_MARKER_BG_COLOR = '#6a26ff';
 
-const Map = styled.div`
-  width: 100%;
-  height: 100%;
-
-  & > div:last-child {
-    display: none;
-  }
-`;
-
-const Button = styled(motion.div)`
-  box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.16);
-  color: #12052e;
-  font-size: 18px;
-  text-align: center;
-
-  & > svg {
-    fill: #12052e;
-  }
-`;
-
-const BottomButton = styled(Button)`
-  flex-grow: 1;
-  padding: 12px 12px;
-  background-color: #ebe8f1;
-  border-radius: 12px;
-`;
-
-const IconButton = styled(Button)`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 48px;
-  height: 48px;
-  background-color: #ffffff;
-  border-radius: 50%;
-`;
-
-// const TopButton = styled(Button)`
-//   height: 36px;
-//   padding: 0 16px;
-//   background-color: #ffffff;
-//   border-radius: 18px;
-//   color: #9c91b5;
-//   font-size: 12px;
-//   line-height: 36px;
-// `;
-
 export function MainPage() {
   const { getDynamicData } = useData();
 
@@ -255,3 +208,50 @@ export function MainPage() {
     </>
   );
 }
+
+const Map = styled.div`
+  width: 100%;
+  height: 100%;
+
+  & > div:last-child {
+    display: none;
+  }
+`;
+
+const Button = styled(motion.div)`
+  box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.16);
+  color: #12052e;
+  font-size: 18px;
+  text-align: center;
+
+  & > svg {
+    fill: #12052e;
+  }
+`;
+
+const BottomButton = styled(Button)`
+  flex-grow: 1;
+  padding: 12px 12px;
+  background-color: #ebe8f1;
+  border-radius: 12px;
+`;
+
+const IconButton = styled(Button)`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background-color: #ffffff;
+  border-radius: 50%;
+`;
+
+const TopButton = styled(Button)`
+  height: 36px;
+  padding: 0 16px;
+  background-color: #ffffff;
+  border-radius: 18px;
+  color: #9c91b5;
+  font-size: 12px;
+  line-height: 36px;
+`;
