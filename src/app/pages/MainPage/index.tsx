@@ -1,13 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useDispatch, useSelector } from 'react-redux';
-import { areaActions } from 'slices/area';
-import {
-  selectExistingAreas,
-  selectProhibitedAreas,
-  selectRecommendedAreas,
-} from 'slices/area/selectors';
-import { kickBoardActions } from 'slices/kickBoard';
+import { useSelector } from 'react-redux';
 import { selectKickBoards } from 'slices/kickBoard/selectors';
 import styled from 'styled-components/macro';
 import { motion } from 'motion/react';
@@ -16,11 +9,14 @@ import useData from 'hooks/useData';
 import useRecommendedAreas from 'hooks/useRecommendedAreas';
 import useProhibitedAreas from 'hooks/useProhibitedAreas';
 import useExistingAreas from 'hooks/useExistingAreas';
+import useMarkerClusteringManager from 'hooks/useMarkerClusteringManager';
 
-const UPDATE_TIME_INTERVAL = 30000;
+// const UPDATE_TIME_INTERVAL = 30000;
 const KICK_BOARD_MARKER_BG_COLOR = '#6a26ff';
 
 export function MainPage() {
+  const MarkerClusteringManager = useMarkerClusteringManager();
+
   const { getDynamicData } = useData();
 
   const kickBoards = useSelector(selectKickBoards);
@@ -74,20 +70,21 @@ export function MainPage() {
 
     var markers = kickBoardMarkersRef.current; // Array
 
-    var htmlMarker1 = {
+    var marker = {
       content: `<div style="display: flex;justify-content: center;position: relative;width: 56px;height: 56px;"><div style="position: absolute;color: #ffffff;top: 10px;"></div><svg style="width: 100%;" viewBox="0 0 128 151" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="64" cy="64" r="64" fill="#a277ff"/><path d="M64 151L91.7128 103H36.2872L64 151Z" fill="#a277ff"/></svg></div>`,
       size: new naver.maps.Size(56, 56),
       anchor: new naver.maps.Point(28, 56),
     };
 
-    new MarkerClustering({
+    new MarkerClusteringManager({
       minClusterSize: 2,
       maxZoom: 19,
       map: mapRef.current,
       markers: markers,
       disableClickZoom: false,
-      icons: [htmlMarker1],
+      icons: [marker],
       indexGenerator: [10, 20, 50, 100, 1000],
+      averageCenter: true,
       stylingFunction: function (clusterMarker, count) {
         clusterMarker
           .getElement()
@@ -96,7 +93,7 @@ export function MainPage() {
     });
 
     return clearEffect;
-  }, [kickBoards, isKickBoardVisible, mapRef]);
+  }, [kickBoards, isKickBoardVisible, mapRef, MarkerClusteringManager]);
 
   return (
     <>

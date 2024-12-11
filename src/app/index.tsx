@@ -15,11 +15,16 @@ import { useTranslation } from 'react-i18next';
 import { MainPage } from './pages/MainPage/Loadable';
 import { NotFoundPage } from './pages/NotFoundPage/Loadable';
 import { useKickBoardSlice } from 'slices/kickBoard';
+import { useGlobalSlice } from 'slices/global';
 import { useAreaSlice } from 'slices/area';
+import useNaverMaps from 'hooks/useNaverMaps';
 
 export function App() {
+  useGlobalSlice();
   useKickBoardSlice();
   useAreaSlice();
+
+  useNaverMaps();
 
   const { i18n } = useTranslation();
 
