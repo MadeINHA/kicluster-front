@@ -1,16 +1,18 @@
-import { MutableRefObject, useEffect } from 'react';
+import { MutableRefObject, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { selectProhibitedAreas } from 'slices/area/selectors';
 
 export default function useProhibitedAreas(
   mapRef: MutableRefObject<naver.maps.Map | null>,
+  isVisible: boolean,
 ) {
   const prohibitedAreas = useSelector(selectProhibitedAreas);
 
+  const polygonsRef = useRef<null | naver.maps.Polygon[]>(null);
+
   useEffect(() => {
-    let prohibitedAreasPolygons: undefined | naver.maps.Polygon[];
     if (prohibitedAreas) {
-      prohibitedAreasPolygons = prohibitedAreas.map(
+      polygonsRef.current = prohibitedAreas.map(
         ({ path }) =>
           new naver.maps.Polygon({
             paths: [path],
@@ -25,9 +27,15 @@ export default function useProhibitedAreas(
       );
     }
     return () => {
-      prohibitedAreasPolygons?.forEach(polygon => {
+      polygonsRef.current?.forEach(polygon => {
         polygon.setMap(null);
       });
     };
   }, [mapRef, prohibitedAreas]);
+
+  useEffect(() => {
+    polygonsRef.current?.forEach(polygon => {
+      polygon.setVisible(isVisible);
+    });
+  }, [isVisible]);
 }

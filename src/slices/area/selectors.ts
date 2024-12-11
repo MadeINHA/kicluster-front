@@ -19,3 +19,8 @@ export const selectExistingAreas = createSelector(
   [selectSlice],
   state => state.existingAreas,
 );
+
+export const selectNearestArea = createSelector(
+  [selectSlice],
+  state => state.nearestArea,
+);

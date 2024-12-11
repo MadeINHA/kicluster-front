@@ -1,4 +1,4 @@
-import { KickBoard } from "slices/kickBoard/types";
+import { KickBoard } from 'slices/kickBoard/types';
 
 export interface Area {
   name: string;
@@ -10,12 +10,17 @@ export interface RecommendedArea {
   kickboard_list: KickBoard[];
 }
 
-export interface ProhibitedArea extends Area { }
+export interface ProhibitedArea extends Area {}
 
-export interface ExistingArea extends Area { }
+export interface ExistingArea extends Area {}
+
+export interface NearestArea extends Area {
+  center: { lat: number; lng: number };
+}
 
 export interface AreaState {
   recommendedAreas: null | RecommendedArea[];
   prohibitedAreas: null | ProhibitedArea[];
   existingAreas: null | ExistingArea[];
+  nearestArea: null | NearestArea;
 }

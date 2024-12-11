@@ -1,16 +1,18 @@
-import { MutableRefObject, useEffect } from 'react';
+import { MutableRefObject, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { selectRecommendedAreas } from 'slices/area/selectors';
 
 export default function useRecommendedAreas(
   mapRef: MutableRefObject<naver.maps.Map | null>,
+  isVisible: boolean,
 ) {
   const recommendedAreas = useSelector(selectRecommendedAreas);
 
+  const polygonsRef = useRef<null | naver.maps.Polygon[]>(null);
+
   useEffect(() => {
-    let recommendedAreasPolygons: undefined | naver.maps.Polygon[];
     if (recommendedAreas) {
-      recommendedAreasPolygons = recommendedAreas.map(
+      polygonsRef.current = recommendedAreas.map(
         ({ kickboard_list }) =>
           new naver.maps.Polygon({
             paths: [kickboard_list],
@@ -25,9 +27,15 @@ export default function useRecommendedAreas(
       );
     }
     return () => {
-      recommendedAreasPolygons?.forEach(polygon => {
+      polygonsRef.current?.forEach(polygon => {
         polygon.setMap(null);
       });
     };
   }, [mapRef, recommendedAreas]);
+
+  useEffect(() => {
+    polygonsRef.current?.forEach(polygon => {
+      polygon.setVisible(isVisible);
+    });
+  }, [isVisible]);
 }

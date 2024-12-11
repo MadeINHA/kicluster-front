@@ -4,6 +4,7 @@ import { useInjectReducer, useInjectSaga } from 'utils/redux-injectors';
 import {
   AreaState,
   ExistingArea,
+  NearestArea,
   ProhibitedArea,
   RecommendedArea,
 } from './types';
@@ -13,6 +14,7 @@ export const initialState: AreaState = {
   recommendedAreas: null,
   prohibitedAreas: null,
   existingAreas: null,
+  nearestArea: null,
 };
 
 const slice = createSlice({
@@ -30,6 +32,10 @@ const slice = createSlice({
     getExistingAreas() {},
     setExistingAreas(state, action: PayloadAction<ExistingArea[]>) {
       state.existingAreas = action.payload;
+    },
+    getNearestArea(_, action: PayloadAction<{ lat: number; lng: number }>) {},
+    setNearestArea(state, action: PayloadAction<NearestArea | null>) {
+      state.nearestArea = action.payload;
     },
   },
 });
