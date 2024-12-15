@@ -1,5 +1,5 @@
 # Kicluster-FE
-![_2024_12_15_23_32_57_346-ezgif com-optimize](https://github.com/user-attachments/assets/dfdd36a0-f818-4a19-a910-0dd31def43e1)
+<img src="https://github.com/user-attachments/assets/dfdd36a0-f818-4a19-a910-0dd31def43e1" width=300 />
 <br/><br/>
 
 ## 사용한 라이브러리
