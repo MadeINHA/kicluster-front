@@ -58,6 +58,22 @@ export function MainPage() {
     setIsNotificationVisible(false);
   };
 
+  // 견인이 필요한 킥보드들 중 하나를 선택했을 때
+  useEffect(() => {
+    if (selectedRedKickBoard) {
+      dispatch(
+        areaActions.getNearestArea({
+          lat: selectedRedKickBoard.lat,
+          lng: selectedRedKickBoard.lng,
+        }),
+      );
+      if (kickBoardVisibility.kickBoard) {
+        setIsRawSelection(true);
+      }
+      setIsAreasVisible(false);
+      setKickBoardVisibility({ kickBoard: false, redKickBoard: false });
+    }
+  }, [dispatch, kickBoardVisibility.kickBoard, selectedRedKickBoard]);
   const startTow = () => {
     if (!selectedRedKickBoard) return;
     setIsLoadingScreenVisible(true);
