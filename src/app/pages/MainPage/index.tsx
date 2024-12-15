@@ -24,15 +24,16 @@ export function MainPage() {
   const [isRedKickBoardVisible, setIsRedKickBoardVisible] = useState(true);
   const [isTowSuccessStackVisible, setIsTowSuccessStackVisible] =
     useState(false);
+  const [isAreasVisible, setIsAreasVisible] = useState(true);
   // const [isTowFailureStackVisible, setIsTowFailureStackVisible] =
   //   useState(false);
 
   const { mapRef, goToMyLocation } = useMap();
-  useRecommendedAreas(mapRef);
-  useProhibitedAreas(mapRef);
-  useExistingAreas(mapRef);
   useKickBoards(mapRef, isKickBoardVisible);
   useRedKickBoards(mapRef, isRedKickBoardVisible);
+  useRecommendedAreas(mapRef, isAreasVisible);
+  useProhibitedAreas(mapRef, isAreasVisible);
+  useExistingAreas(mapRef, isAreasVisible);
   const readyForTow = () => {
     // setIsOnlyTowableKickBoardVisible(true);
     // setIsNotificationVisible(false);
