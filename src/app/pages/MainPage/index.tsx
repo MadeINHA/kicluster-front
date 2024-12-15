@@ -22,6 +22,10 @@ export function MainPage() {
   const [isNotificationVisible, setIsNotificationVisible] = useState(false);
   const [isLoadingScreenVisible, setIsLoadingScreenVisible] = useState(false);
   const [isRedKickBoardVisible, setIsRedKickBoardVisible] = useState(true);
+  const [isTowSuccessStackVisible, setIsTowSuccessStackVisible] =
+    useState(false);
+  // const [isTowFailureStackVisible, setIsTowFailureStackVisible] =
+  //   useState(false);
 
   const { mapRef, goToMyLocation } = useMap();
   useRecommendedAreas(mapRef);
@@ -51,7 +55,16 @@ export function MainPage() {
       >
         <Map id="map" />
         <LoadingScreen isVisible={isLoadingScreenVisible} />
-        <TowSuccessScreen />
+        <TowSuccessScreen
+          isVisible={isTowSuccessStackVisible}
+          onButtonClick={() => {
+            mapRef.current?.setOptions('draggable', true);
+            mapRef.current?.setOptions('maxZoom', undefined);
+            mapRef.current?.setOptions('minZoom', undefined);
+            setIsTowSuccessStackVisible(false);
+            setIsNotificationVisible(true);
+          }}
+        />
         <Notification
           onClick={readyForTow}
           isVisible={isNotificationVisible}
