@@ -8,19 +8,22 @@ import useRecommendedAreas from 'hooks/useRecommendedAreas';
 import useProhibitedAreas from 'hooks/useProhibitedAreas';
 import useExistingAreas from 'hooks/useExistingAreas';
 import useKickBoards from 'hooks/useKickBoards';
+import useRedKickBoards from 'hooks/useRedKickBoards';
 
 // const UPDATE_TIME_INTERVAL = 30000;
 
 export function MainPage() {
   const { getDynamicData } = useData();
 
-  const [isKickBoardVisible] = useState(true);
+  const [isKickBoardVisible, setIsKickBoardVisible] = useState(true);
+  const [isRedKickBoardVisible, setIsRedKickBoardVisible] = useState(true);
 
   const { mapRef, goToMyLocation } = useMap();
   useRecommendedAreas(mapRef);
   useProhibitedAreas(mapRef);
   useExistingAreas(mapRef);
   useKickBoards(mapRef, isKickBoardVisible);
+  useRedKickBoards(mapRef, isRedKickBoardVisible);
 
   return (
     <>

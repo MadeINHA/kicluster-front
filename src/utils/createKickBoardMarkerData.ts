@@ -26,8 +26,9 @@ export function createKickBoardMarkerData(
         </svg>
       `,
       size: new naver.maps.Size(48, 48),
-      anchor: new naver.maps.Point(24, 48),
+      anchor: new naver.maps.Point(24, 42.44),
     },
+    zIndex: kickBoard.parkingZone === 0 ? 2 : undefined,
   });
 
   return {

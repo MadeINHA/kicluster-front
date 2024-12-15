@@ -15,33 +15,13 @@ export default function useKickBoards(
   const kickBoards = useSelector(selectKickBoards);
 
   const markerClusteringManagerRef = useRef<any>(null);
-  const listenersRef = useRef<null | naver.maps.MapEventListener[]>(null);
 
   useEffect(() => {
     if (!MarkerClusteringManager || !mapRef.current) return;
     if (kickBoards) {
-      const markers = kickBoards.map(kickBoard => {
-        const { marker, listener } = createKickBoardMarkerData(
-          kickBoard,
-          kickBoard.parkingZone === 0
-            ? () => {
-                // setSelectedKickBoardData({ kickBoard, marker });
-                // console.log({ kickBoard, marker });
-                // mapRef.current?.setCenter(kickBoard);
-                // mapRef.current?.setZoom(16, true);
-              }
-            : undefined,
-        );
-
-        if (listener) {
-          if (!listenersRef.current) {
-            listenersRef.current = [];
-          }
-          listenersRef.current.push(listener);
-        }
-
-        return marker;
-      });
+      const markers = kickBoards
+        .filter(kickBoard => kickBoard.parkingZone !== 0) // 견인이 필요한 킥보드는 따로 보여줌.
+        .map(kickBoard => createKickBoardMarkerData(kickBoard).marker);
 
       if (!markerClusteringManagerRef.current) {
         markerClusteringManagerRef.current = new MarkerClusteringManager({
@@ -67,7 +47,7 @@ export default function useKickBoards(
                   </div>
                 `,
               size: new naver.maps.Size(48, 48),
-              anchor: new naver.maps.Point(24, 48),
+              anchor: new naver.maps.Point(24, 42.44),
             },
           ],
           indexGenerator: [10, 20, 50, 100, 1000],
@@ -82,12 +62,6 @@ export default function useKickBoards(
     } else {
       markerClusteringManagerRef.current?.setMap(null);
     }
-
-    return () => {
-      listenersRef.current?.forEach(listener => {
-        naver.maps.Event.removeListener(listener);
-      });
-    };
   }, [MarkerClusteringManager, kickBoards, mapRef]);
 
   useEffect(() => {
