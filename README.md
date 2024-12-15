@@ -1,12 +1,13 @@
 # Kicluster-FE
-<br/>
+![_2024_12_15_23_32_57_346-ezgif com-optimize](https://github.com/user-attachments/assets/dfdd36a0-f818-4a19-a910-0dd31def43e1)
+<br/><br/>
 
 ## 사용한 라이브러리
 * React Boilerplate CRA Template
   * react@18.2.0
   * typescript@4.6.4
   * react-router-dom@6.3.0
-  * @reduxjs/toolkit@1.8.5(reselect, immer)
+  * @reduxjs/toolkit@1.8.5 (reselect, immer)
   * redux-saga@1.2.1
   * styled-components@5.3.5
 - axios@1.7.7
