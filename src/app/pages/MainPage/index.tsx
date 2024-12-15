@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
@@ -9,6 +9,7 @@ import useRecommendedAreas from 'hooks/useRecommendedAreas';
 import useProhibitedAreas from 'hooks/useProhibitedAreas';
 import useExistingAreas from 'hooks/useExistingAreas';
 import { areaActions } from 'slices/area';
+import { selectNearestArea } from 'slices/area/selectors';
 import useNearestArea from 'hooks/useNearestArea';
 import Notification from 'app/components/Notification';
 import useKickBoards from 'hooks/useKickBoards';
@@ -16,7 +17,6 @@ import useRedKickBoards from 'hooks/useRedKickBoards';
 import LoadingScreen from 'app/components/LoadingScreen';
 import TowSuccessScreen from 'app/components/TowSuccessScreen';
 import TopButton from 'app/components/TopButton';
-import { selectNearestArea } from 'slices/area/selectors';
 
 // const UPDATE_TIME_INTERVAL = 30000;
 
@@ -26,6 +26,9 @@ export function MainPage() {
   const { getDynamicData } = useData();
 
   const nearestArea = useSelector(selectNearestArea);
+
+  const polylineRef = useRef<null | naver.maps.Polyline>(null);
+
   const [isNotificationVisible, setIsNotificationVisible] = useState(false);
   const [isTowing, setIsTowing] = useState(false);
   const [timer, setTimer] = useState(0);
@@ -74,6 +77,52 @@ export function MainPage() {
       setKickBoardVisibility({ kickBoard: false, redKickBoard: false });
     }
   }, [dispatch, kickBoardVisibility.kickBoard, selectedRedKickBoard]);
+
+  useEffect(() => {
+    if (!mapRef.current) return;
+    if (nearestArea && selectedRedKickBoard) {
+      mapRef.current.setCenter({
+        lat: (nearestArea.center.lat + selectedRedKickBoard.lat) / 2,
+        lng: (nearestArea.center.lng + selectedRedKickBoard.lng) / 2,
+      });
+      mapRef.current.setZoom(18, true);
+
+      if (!polylineRef.current) {
+        polylineRef.current = new naver.maps.Polyline({
+          path: [],
+          strokeColor: '#04D9C4',
+          strokeWeight: 5,
+          strokeLineJoin: 'round',
+          strokeLineCap: 'round',
+        });
+      }
+      polylineRef.current.setPath([
+        {
+          lat: selectedRedKickBoard.lat,
+          lng: selectedRedKickBoard.lng,
+        },
+        { lat: nearestArea.center.lat, lng: nearestArea.center.lng },
+      ]);
+      polylineRef.current.setMap(mapRef.current);
+    } else {
+      if (polylineRef.current) polylineRef.current.setMap(null);
+    }
+
+    // axiosInstance
+    //   .get('/map-direction/v1/driving', {
+    //     baseURL: 'https://naveropenapi.apigw.ntruss.com',
+    //     headers: {
+    //       'x-ncp-apigw-api-key-id': config.naverMapsApi.id,
+    //       'x-ncp-apigw-api-key': config.naverMapsApi.secret,
+    //     },
+    //     params: {
+    //       start: `${selectedKickBoardData.kickBoard.lat},${selectedKickBoardData.kickBoard.lng}`,
+    //       goal: `${nearestArea.center.lat},${nearestArea.center.lng}`,
+    //     },
+    //   })
+    //   .then(r => console.log(r));
+  }, [mapRef, nearestArea, selectedRedKickBoard]);
+
   const startTow = () => {
     if (!selectedRedKickBoard) return;
     setIsLoadingScreenVisible(true);
@@ -105,8 +154,8 @@ export function MainPage() {
       //     selectedKickBoardData.marker.getPosition() as naver.maps.LatLng
       //   ).lng(),
       // };
-      const b = [37.450535283273815, 126.65425341704302];
-      let c = 1;
+      // const b = [37.450535283273815, 126.65425341704302];
+      // let c = 1;
       setDistance(21);
       // setInterval(() => {
       //   if (c === 6) return;
@@ -140,6 +189,29 @@ export function MainPage() {
   };
 
   useEffect(() => {
+    const interval = setInterval(() => {
+      setTimer(timer => timer - 1);
+    }, 1000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [timer]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (distance < 4) {
+        return;
+      }
+      setDistance(timer => timer - 4);
+    }, 700);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [distance]);
+
+  useEffect(() => {
     const timeout = setTimeout(() => {
       setIsNotificationVisible(true);
     }, 1000);
@@ -165,6 +237,9 @@ export function MainPage() {
             mapRef.current?.setOptions('maxZoom', undefined);
             mapRef.current?.setOptions('minZoom', undefined);
             setIsTowSuccessStackVisible(false);
+            resetSelectedRedKickBoard();
+            setKickBoardVisibility({ kickBoard: true, redKickBoard: true });
+            dispatch(areaActions.setNearestArea(null));
             setIsNotificationVisible(true);
           }}
         />
