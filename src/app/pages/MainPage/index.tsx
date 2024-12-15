@@ -47,15 +47,7 @@ export function MainPage() {
         <title>MainPage</title>
         <meta name="description" content="A Boilerplate application mainpage" />
       </Helmet>
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          position: 'relative',
-          height: '100%',
-          overflow: 'hidden',
-        }}
-      >
+      <Container>
         <Map id="map" />
         <LoadingScreen isVisible={isLoadingScreenVisible} />
         <TowSuccessScreen
@@ -73,10 +65,18 @@ export function MainPage() {
           isVisible={isNotificationVisible}
           message="불량 주차된 킥보드가 감지되었습니다"
         />
-      </div>
+      </Container>
     </>
   );
 }
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+`;
 
 const Map = styled.div`
   width: 100%;
@@ -113,14 +113,4 @@ const IconButton = styled(Button)`
   height: 48px;
   background-color: #ffffff;
   border-radius: 50%;
-`;
-
-const TopButton = styled(Button)`
-  height: 36px;
-  padding: 0 16px;
-  background-color: #ffffff;
-  border-radius: 18px;
-  color: #9c91b5;
-  font-size: 12px;
-  line-height: 36px;
 `;
