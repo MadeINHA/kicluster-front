@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
@@ -113,6 +113,7 @@ export function MainPage() {
       // }, 700);
     }, 2134);
   };
+
   const endTow = () => {
     setIsLoadingScreenVisible(true);
     // axiosInstance.get();
@@ -121,6 +122,17 @@ export function MainPage() {
       setIsLoadingScreenVisible(false);
     }, 1432);
   };
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setIsNotificationVisible(true);
+    }, 1000);
+
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, []);
+
   return (
     <>
       <Helmet>
