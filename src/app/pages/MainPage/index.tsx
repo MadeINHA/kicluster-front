@@ -7,6 +7,7 @@ import useData from 'hooks/useData';
 import useRecommendedAreas from 'hooks/useRecommendedAreas';
 import useProhibitedAreas from 'hooks/useProhibitedAreas';
 import useExistingAreas from 'hooks/useExistingAreas';
+import useNearestArea from 'hooks/useNearestArea';
 import Notification from 'app/components/Notification';
 import useKickBoards from 'hooks/useKickBoards';
 import useRedKickBoards from 'hooks/useRedKickBoards';
@@ -34,6 +35,7 @@ export function MainPage() {
   useRecommendedAreas(mapRef, isAreasVisible);
   useProhibitedAreas(mapRef, isAreasVisible);
   useExistingAreas(mapRef, isAreasVisible);
+  useNearestArea(mapRef);
   const readyForTow = () => {
     // setIsOnlyTowableKickBoardVisible(true);
     // setIsNotificationVisible(false);
