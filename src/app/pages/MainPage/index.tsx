@@ -16,6 +16,7 @@ import useRedKickBoards from 'hooks/useRedKickBoards';
 import LoadingScreen from 'app/components/LoadingScreen';
 import TowSuccessScreen from 'app/components/TowSuccessScreen';
 import TopButton from 'app/components/TopButton';
+import { selectNearestArea } from 'slices/area/selectors';
 
 // const UPDATE_TIME_INTERVAL = 30000;
 
@@ -24,11 +25,15 @@ export function MainPage() {
 
   const { getDynamicData } = useData();
 
+  const nearestArea = useSelector(selectNearestArea);
   const [isNotificationVisible, setIsNotificationVisible] = useState(false);
+  const [isTowing, setIsTowing] = useState(false);
+  const [timer, setTimer] = useState(0);
   const [isLoadingScreenVisible, setIsLoadingScreenVisible] = useState(false);
   const [isTowSuccessStackVisible, setIsTowSuccessStackVisible] =
     useState(false);
   const [isAreasVisible, setIsAreasVisible] = useState(true);
+  const [distance, setDistance] = useState(21);
   const [kickBoardVisibility, setKickBoardVisibility] = useState({
     kickBoard: true,
     redKickBoard: true,
@@ -47,11 +52,75 @@ export function MainPage() {
     mapRef,
     kickBoardVisibility.redKickBoard,
   );
+
   const readyForTow = () => {
-    // setIsOnlyTowableKickBoardVisible(true);
-    // setIsNotificationVisible(false);
+    setKickBoardVisibility({ kickBoard: false, redKickBoard: true });
+    setIsNotificationVisible(false);
   };
 
+  const startTow = () => {
+    if (!selectedRedKickBoard) return;
+    setIsLoadingScreenVisible(true);
+    // dispatch(
+    //   kickBoardActions.lentKickBoard({
+    //     kickBoardId: selectedKickBoardData.kickBoard.kickboardId,
+    //     path: [...nearestArea.path, nearestArea.path[0]],
+    //   }),
+    // );
+
+    setTimeout(() => {
+      setIsAreasVisible(true);
+      setIsTowing(true);
+      setTimer(120);
+      // mapRef.current?.setZoom(18, true);
+      mapRef.current?.setOptions('draggable', false);
+      mapRef.current?.setOptions('maxZoom', 18);
+      mapRef.current?.setOptions('minZoom', 18);
+      mapRef.current?.setCenter({
+        lat: selectedRedKickBoard.lat ?? 0,
+        lng: selectedRedKickBoard.lng ?? 0,
+      });
+      setIsLoadingScreenVisible(false);
+      // const a = {
+      //   lat: (
+      //     selectedKickBoardData.marker.getPosition() as naver.maps.LatLng
+      //   ).lat(),
+      //   lng: (
+      //     selectedKickBoardData.marker.getPosition() as naver.maps.LatLng
+      //   ).lng(),
+      // };
+      const b = [37.450535283273815, 126.65425341704302];
+      let c = 1;
+      setDistance(21);
+      // setInterval(() => {
+      //   if (c === 6) return;
+      //   selectedKickBoardData.marker.setPosition({
+      //     lat: a.lat + ((b[0] - a.lat) / 5) * c,
+      //     lng: a.lng - ((a.lng - b[1]) / 5) * c,
+      //   });
+      //   mapRef.current?.setCenter({
+      //     lat: a.lat + ((b[0] - a.lat) / 5) * c,
+      //     lng: a.lng - ((a.lng - b[1]) / 5) * c,
+      //   });
+      //   polylineRef.current?.setPath([
+      //     {
+      //       lat: a.lat + ((b[0] - a.lat) / 5) * c,
+      //       lng: a.lng - ((a.lng - b[1]) / 5) * c,
+      //     },
+      //     { lat: b[0], lng: b[1] },
+      //   ]);
+      //   c++;
+      // }, 700);
+    }, 2134);
+  };
+  const endTow = () => {
+    setIsLoadingScreenVisible(true);
+    // axiosInstance.get();
+    setTimeout(() => {
+      setIsTowSuccessStackVisible(true);
+      setIsLoadingScreenVisible(false);
+    }, 1432);
+  };
   return (
     <>
       <Helmet>
@@ -133,6 +202,216 @@ export function MainPage() {
             </TopButton>
           )}
         </div>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            rowGap: '12px',
+            position: 'absolute',
+            bottom: 'calc(99px + env(safe-area-inset-bottom))',
+            right: 'env(safe-area-inset-right)',
+            padding: '24px',
+          }}
+        >
+          <IconButton
+            whileTap={{ scale: 0.95, backgroundColor: '#6a26ff' }}
+            transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+            onClick={() => {
+              getDynamicData();
+            }}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              height="24px"
+              viewBox="0 -960 960 960"
+              width="24px"
+            >
+              <path d="M480-160q-134 0-227-93t-93-227q0-134 93-227t227-93q69 0 132 28.5T720-690v-110h80v280H520v-80h168q-32-56-87.5-88T480-720q-100 0-170 70t-70 170q0 100 70 170t170 70q77 0 139-44t87-116h84q-28 106-114 173t-196 67Z" />
+            </svg>
+          </IconButton>
+          <IconButton
+            whileTap={{ scale: 0.95, backgroundColor: '#6a26ff' }}
+            transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+            onClick={() => {
+              goToMyLocation();
+            }}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              height="24px"
+              viewBox="0 -960 960 960"
+              width="24px"
+            >
+              <path d="M440-42v-80q-125-14-214.5-103.5T122-440H42v-80h80q14-125 103.5-214.5T440-838v-80h80v80q125 14 214.5 103.5T838-520h80v80h-80q-14 125-103.5 214.5T520-122v80h-80Zm40-158q116 0 198-82t82-198q0-116-82-198t-198-82q-116 0-198 82t-82 198q0 116 82 198t198 82Zm0-120q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47Z" />
+            </svg>
+          </IconButton>
+        </div>
+        {nearestArea ? (
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              rowGap: '12px',
+              position: 'absolute',
+              bottom: 'env(safe-area-inset-bottom)',
+              width: '100%',
+              padding: '24px',
+              backgroundColor: '#ffffff',
+              borderRadius: '12px 12px 0 0',
+              boxShadow: '0px 1px 4px 0px rgba(0, 0, 0, 0.16)',
+            }}
+          >
+            {isTowing ? (
+              <>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    columnGap: '16px',
+                    padding: '16px 32px',
+                    borderRadius: '12px',
+                    backgroundColor: '#f5f4f8',
+                  }}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    height="24px"
+                    viewBox="0 -960 960 960"
+                    width="24px"
+                    fill="#5f6368"
+                  >
+                    <path d="M240-120v-720h280q100 0 170 70t70 170q0 100-70 170t-170 70H400v240H240Zm160-400h128q33 0 56.5-23.5T608-600q0-33-23.5-56.5T528-680H400v160Z" />
+                  </svg>
+                  <div>{nearestArea.name}</div>
+                </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-evenly',
+                    padding: '16px 0',
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <div>남은 시간</div>
+                    <div>
+                      {Math.floor(timer / 60) === 0
+                        ? timer
+                        : `${Math.floor(timer / 60)}:${`0${timer % 60}`.slice(
+                            -2,
+                          )}`}
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <div>남은 거리</div>
+                    <div>{distance}m</div>
+                  </div>
+                </div>
+                <BottomButton
+                  whileTap={{ scale: 0.95, backgroundColor: '#6a26ff' }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                  onClick={() => {
+                    endTow();
+                  }}
+                >
+                  견인 종료하기
+                </BottomButton>
+              </>
+            ) : (
+              <>
+                <div style={{ fontSize: '12px', textAlign: 'center' }}>
+                  목표 주차 권장 구역
+                </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    columnGap: '16px',
+                    padding: '16px 32px',
+                    borderRadius: '12px',
+                    backgroundColor: '#f5f4f8',
+                  }}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    height="24px"
+                    viewBox="0 -960 960 960"
+                    width="24px"
+                    fill="#5f6368"
+                  >
+                    <path d="M240-120v-720h280q100 0 170 70t70 170q0 100-70 170t-170 70H400v240H240Zm160-400h128q33 0 56.5-23.5T608-600q0-33-23.5-56.5T528-680H400v160Z" />
+                  </svg>
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      rowGap: '8px',
+                    }}
+                  >
+                    <div>임시 주차 구역</div>
+                    <div
+                      style={{
+                        display: 'flex',
+                        columnGap: '8px',
+                        fontSize: '12px',
+                      }}
+                    >
+                      <div>견인 거리 21m</div>
+                      <div>견인 시간 2분</div>
+                    </div>
+                  </div>
+                </div>
+                <BottomButton
+                  whileTap={{ scale: 0.95, backgroundColor: '#6a26ff' }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                  onClick={() => {
+                    startTow();
+                  }}
+                >
+                  견인 시작하기
+                </BottomButton>
+              </>
+            )}
+          </div>
+        ) : (
+          <div
+            style={{
+              display: 'flex',
+              columnGap: '12px',
+              position: 'absolute',
+              bottom: 'env(safe-area-inset-bottom)',
+              width: '100%',
+              padding: '24px',
+              backgroundColor: '#ffffff',
+              borderRadius: '12px 12px 0 0',
+              boxShadow: '0px 1px 4px 0px rgba(0, 0, 0, 0.16)',
+            }}
+          >
+            <BottomButton
+              whileTap={{ scale: 0.95, backgroundColor: '#6a26ff' }}
+              transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+            >
+              주행 모드
+            </BottomButton>
+            <BottomButton
+              whileTap={{ scale: 0.95, backgroundColor: '#6a26ff' }}
+              transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+            >
+              견인 모드
+            </BottomButton>
+          </div>
+        )}
       </Container>
     </>
   );
