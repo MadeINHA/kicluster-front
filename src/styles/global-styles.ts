@@ -3,7 +3,7 @@ import { createGlobalStyle } from 'styled-components';
 export const GlobalStyle = createGlobalStyle`
   @font-face {
     font-family: 'Noto Sans KR';
-    src: local('Noto Sans KR'), url(${require('../resources/fonts/NotoSansKR-Medium.ttf')});
+    src: local('Noto Sans KR'), url(${require('../resources/fonts/NotoSansKR.ttf')});
   }
 
   html {
