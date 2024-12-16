@@ -385,14 +385,15 @@ export function MainPage() {
               style={{
                 display: 'flex',
                 flexDirection: 'column',
-                rowGap: '12px',
+                rowGap: '16px',
                 position: 'absolute',
-                bottom: 'env(safe-area-inset-bottom)',
+                bottom: 'calc(0px - env(safe-area-inset-bottom))',
                 width: '100%',
-                padding: '24px',
+                padding:
+                  '16px 16px calc(env(safe-area-inset-bottom) + 32px) 16px',
                 backgroundColor: '#ffffff',
                 borderRadius: '12px 12px 0 0',
-                boxShadow: '0px 1px 4px 0px rgba(0, 0, 0, 0.16)',
+                boxShadow: '0px 0px 30px 0px rgba(0, 0, 0, 0.2)',
               }}
             >
               {isTowing ? (
@@ -403,8 +404,8 @@ export function MainPage() {
                       alignItems: 'center',
                       columnGap: '16px',
                       padding: '16px 32px',
+                      backgroundColor: '#eeeeee',
                       borderRadius: '12px',
-                      backgroundColor: '#f5f4f8',
                     }}
                   >
                     <svg
@@ -412,11 +413,15 @@ export function MainPage() {
                       height="24px"
                       viewBox="0 -960 960 960"
                       width="24px"
-                      fill="#5f6368"
+                      fill="#515151"
                     >
-                      <path d="M240-120v-720h280q100 0 170 70t70 170q0 100-70 170t-170 70H400v240H240Zm160-400h128q33 0 56.5-23.5T608-600q0-33-23.5-56.5T528-680H400v160Z" />
+                      <path d="M380-380v180q0 24.54-17.54 42.27Q344.92-140 320-140q-24.54 0-42.27-17.73Q260-175.46 260-200v-560q0-24.54 17.73-42.27Q295.46-820 320-820h200q91.15 0 155.58 64.42Q740-691.15 740-600t-64.42 155.58Q611.15-380 520-380H380Zm0-120h144.92q41.08 0 70.54-29.46 29.46-29.46 29.46-70.54 0-41.08-29.46-70.54Q566-700 524.92-700H380v200Z" />
                     </svg>
-                    <div>{nearestArea.name}</div>
+                    <div>
+                      {nearestArea.name === '새로운 주차 구역'
+                        ? '임시 주차 구역'
+                        : nearestArea.name}
+                    </div>
                   </div>
                   <div
                     style={{
@@ -464,7 +469,7 @@ export function MainPage() {
                 </>
               ) : (
                 <>
-                  <div style={{ fontSize: '12px', textAlign: 'center' }}>
+                  <div style={{ textAlign: 'center', fontWeight: 500 }}>
                     목표 주차 권장 구역
                   </div>
                   <div
@@ -473,8 +478,8 @@ export function MainPage() {
                       alignItems: 'center',
                       columnGap: '16px',
                       padding: '16px 32px',
+                      backgroundColor: '#eeeeee',
                       borderRadius: '12px',
-                      backgroundColor: '#f5f4f8',
                     }}
                   >
                     <svg
@@ -482,9 +487,9 @@ export function MainPage() {
                       height="24px"
                       viewBox="0 -960 960 960"
                       width="24px"
-                      fill="#5f6368"
+                      fill="#515151"
                     >
-                      <path d="M240-120v-720h280q100 0 170 70t70 170q0 100-70 170t-170 70H400v240H240Zm160-400h128q33 0 56.5-23.5T608-600q0-33-23.5-56.5T528-680H400v160Z" />
+                      <path d="M380-380v180q0 24.54-17.54 42.27Q344.92-140 320-140q-24.54 0-42.27-17.73Q260-175.46 260-200v-560q0-24.54 17.73-42.27Q295.46-820 320-820h200q91.15 0 155.58 64.42Q740-691.15 740-600t-64.42 155.58Q611.15-380 520-380H380Zm0-120h144.92q41.08 0 70.54-29.46 29.46-29.46 29.46-70.54 0-41.08-29.46-70.54Q566-700 524.92-700H380v200Z" />
                     </svg>
                     <div
                       style={{
@@ -493,7 +498,11 @@ export function MainPage() {
                         rowGap: '8px',
                       }}
                     >
-                      <div>임시 주차 구역</div>
+                      <div>
+                        {nearestArea.name === '새로운 주차 구역'
+                          ? '임시 주차 구역'
+                          : nearestArea.name}
+                      </div>
                       <div
                         style={{
                           display: 'flex',
@@ -604,8 +613,12 @@ const Button = styled(motion.div)`
 const BottomButton = styled(Button)`
   flex-grow: 1;
   padding: 12px 12px;
-  background-color: #ebe8f1;
+  background-color: #04d9c4;
   border-radius: 12px;
+  box-shadow: 0 5px 7.5px 0 rgba(4, 217, 196, 0.2);
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 500;
 `;
 
 const IconButton = styled(Button)`
