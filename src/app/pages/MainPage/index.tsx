@@ -18,6 +18,7 @@ import LoadingScreen from 'app/components/LoadingScreen';
 import TowSuccessScreen from 'app/components/TowSuccessScreen';
 import TopButton from 'app/components/TopButton';
 import { config } from 'config';
+import getDistance from 'utils/getDistance';
 
 // const UPDATE_TIME_INTERVAL = 30000;
 
@@ -489,8 +490,30 @@ export function MainPage() {
                         fontSize: '12px',
                       }}
                     >
-                      <div>견인 거리 21m</div>
-                      <div>견인 시간 2분</div>
+                      <div>
+                        견인 거리{' '}
+                        {Math.floor(
+                          getDistance(
+                            selectedRedKickBoard?.lat ?? 0,
+                            selectedRedKickBoard?.lng ?? 0,
+                            nearestArea.center.lat,
+                            nearestArea.center.lng,
+                          ) * 1000,
+                        )}
+                        m
+                      </div>
+                      <div>
+                        견인 시간{' '}
+                        {Math.floor(
+                          getDistance(
+                            selectedRedKickBoard?.lat ?? 0,
+                            selectedRedKickBoard?.lng ?? 0,
+                            nearestArea.center.lat,
+                            nearestArea.center.lng,
+                          ) * 2,
+                        ) + 1}
+                        분
+                      </div>
                     </div>
                   </div>
                 </div>
