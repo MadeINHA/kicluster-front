@@ -48,8 +48,6 @@ function* getNearestAreaSaga({ payload }) {
       );
     };
 
-    console.log(response1.data.data.name, response1.data.data.path);
-
     if (
       getDistance(sum[1], sum[0]) <
       getDistance(response2.data.data.cent_lng, response2.data.data.cent_lat)
