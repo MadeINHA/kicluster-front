@@ -48,7 +48,7 @@ export function MainPage() {
   // const [isTowFailureStackVisible, setIsTowFailureStackVisible] =
   //   useState(false);
 
-  const { mapRef, goToMyLocation } = useMap();
+  const { mapRef } = useMap();
   useRecommendedAreas(mapRef, isAreasVisible);
   useProhibitedAreas(mapRef, isAreasVisible);
   useExistingAreas(mapRef, isAreasVisible);
@@ -234,6 +234,7 @@ export function MainPage() {
   }, []);
 
   useEffect(() => {
+    if (!notificationMessage) return;
     const timeout = setTimeout(() => {
       setNotificationMessage('');
     }, 7000);
