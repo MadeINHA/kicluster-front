@@ -17,6 +17,7 @@ import useRedKickBoards from 'hooks/useRedKickBoards';
 import LoadingScreen from 'app/components/LoadingScreen';
 import TowSuccessScreen from 'app/components/TowSuccessScreen';
 import TopButton from 'app/components/TopButton';
+import { config } from 'config';
 
 // const UPDATE_TIME_INTERVAL = 30000;
 
@@ -42,6 +43,7 @@ export function MainPage() {
     redKickBoard: true,
   });
   const [isRawSelection, setIsRawSelection] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState('');
   // const [isTowFailureStackVisible, setIsTowFailureStackVisible] =
   //   useState(false);
 
@@ -58,7 +60,7 @@ export function MainPage() {
 
   const readyForTow = () => {
     setKickBoardVisibility({ kickBoard: false, redKickBoard: true });
-    setIsNotificationVisible(false);
+    setNotificationMessage('');
   };
 
   // 견인이 필요한 킥보드들 중 하나를 선택했을 때
@@ -212,14 +214,32 @@ export function MainPage() {
   }, [distance]);
 
   useEffect(() => {
+    const deviceId =
+      localStorage.getItem('kiclusterDeviceId') ?? new Date().getTime();
+    localStorage.setItem('kiclusterDeviceId', `${deviceId}`);
+
+    const eventSource = new EventSource(
+      `${config.apiUrl}/sse/subscribe/${deviceId}`,
+    );
+
+    eventSource.addEventListener('message', ({ data }) => {
+      setNotificationMessage(data);
+    });
+
+    return () => {
+      eventSource.close();
+    };
+  }, []);
+
+  useEffect(() => {
     const timeout = setTimeout(() => {
-      setIsNotificationVisible(true);
-    }, 1000);
+      setNotificationMessage('');
+    }, 7000);
 
     return () => {
       clearTimeout(timeout);
     };
-  }, []);
+  }, [notificationMessage]);
 
   return (
     <>
@@ -240,19 +260,18 @@ export function MainPage() {
             resetSelectedRedKickBoard();
             setKickBoardVisibility({ kickBoard: true, redKickBoard: true });
             dispatch(areaActions.setNearestArea(null));
-            setIsNotificationVisible(true);
           }}
         />
         <Notification
           onClick={readyForTow}
-          isVisible={isNotificationVisible}
-          message="불량 주차된 킥보드가 감지되었습니다"
+          isVisible={!!notificationMessage}
+          message={notificationMessage}
         />
         <div
           style={{
             display: 'flex',
             position: 'absolute',
-            top: isNotificationVisible
+            top: notificationMessage
               ? 'calc(env(safe-area-inset-top) + 16px + 48px + 32px)'
               : '16px',
             left: 'env(safe-area-inset-left)',
