@@ -16,6 +16,14 @@ const slice = createSlice({
     setKickBoards(state, action: PayloadAction<KickBoard[]>) {
       state.kickBoards = action.payload;
     },
+    returnKickBoardMove(
+      _,
+      __: PayloadAction<{
+        id: number;
+        lat: number;
+        lng: number;
+      }>,
+    ) {},
   },
 });
 

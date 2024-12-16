@@ -1,8 +1,10 @@
 import { MutableRefObject, useEffect, useRef } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { selectKickBoards } from 'slices/kickBoard/selectors';
 import { createKickBoardMarkerData } from 'utils/createKickBoardMarkerData';
 import useMarkerClusteringManager from './useMarkerClusteringManager';
+import { checkKickBoardMove } from 'api/kickBoard';
+import { kickBoardActions } from 'slices/kickBoard';
 
 const COLOR = '#00A594';
 
@@ -11,17 +13,49 @@ export default function useKickBoards(
   isVisible: boolean,
 ) {
   const MarkerClusteringManager = useMarkerClusteringManager();
+  const dispatch = useDispatch();
 
   const kickBoards = useSelector(selectKickBoards);
 
   const markerClusteringManagerRef = useRef<any>(null);
+  const listenersRef = useRef<null | naver.maps.MapEventListener[]>(null);
 
   useEffect(() => {
     if (!MarkerClusteringManager || !mapRef.current) return;
     if (kickBoards) {
       const markers = kickBoards
         .filter(kickBoard => kickBoard.parkingZone !== 0) // 견인이 필요한 킥보드는 따로 보여줌.
-        .map(kickBoard => createKickBoardMarkerData(kickBoard).marker);
+        .map(kickBoard => {
+          const { marker, listeners } = createKickBoardMarkerData(
+            kickBoard,
+            (id, lat, lng) => {
+              checkKickBoardMove(id, lat, lng).then(res => {
+                if (
+                  res.data.data ||
+                  window.confirm(
+                    '해당 구역은 금지 구역입니다. 그래도 반납하시겠습니까?',
+                  )
+                ) {
+                  dispatch(
+                    kickBoardActions.returnKickBoardMove({ id, lat, lng }),
+                  );
+                } else {
+                  marker.setPosition({
+                    lat: kickBoard.lat,
+                    lng: kickBoard.lng,
+                  });
+                }
+              });
+            },
+          );
+
+          if (!listenersRef.current) {
+            listenersRef.current = [];
+          }
+          listenersRef.current.push(...listeners);
+
+          return marker;
+        });
 
       if (!markerClusteringManagerRef.current) {
         markerClusteringManagerRef.current = new MarkerClusteringManager({
@@ -62,7 +96,13 @@ export default function useKickBoards(
     } else {
       markerClusteringManagerRef.current?.setMap(null);
     }
-  }, [MarkerClusteringManager, kickBoards, mapRef]);
+
+    return () => {
+      listenersRef.current?.forEach(listener => {
+        naver.maps.Event.removeListener(listener);
+      });
+    };
+  }, [MarkerClusteringManager, dispatch, kickBoards, mapRef]);
 
   useEffect(() => {
     markerClusteringManagerRef.current?.setMap(

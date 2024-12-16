@@ -1,12 +1,7 @@
-import {
-  Dispatch,
-  MutableRefObject,
-  SetStateAction,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
-import { useSelector } from 'react-redux';
+import { checkKickBoardMove } from 'api/kickBoard';
+import { MutableRefObject, useEffect, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { kickBoardActions } from 'slices/kickBoard';
 import { selectKickBoards } from 'slices/kickBoard/selectors';
 import { KickBoard } from 'slices/kickBoard/types';
 import { createKickBoardMarkerData } from 'utils/createKickBoardMarkerData';
@@ -15,6 +10,8 @@ export default function useRedKickBoards(
   mapRef: MutableRefObject<naver.maps.Map | null>,
   isVisible: boolean,
 ) {
+  const dispatch = useDispatch();
+
   const kickBoards = useSelector(selectKickBoards);
 
   const markersRef = useRef<null | naver.maps.Marker[]>(null);
@@ -33,8 +30,27 @@ export default function useRedKickBoards(
       markersRef.current = kickBoards
         .filter(kickBoard => kickBoard.parkingZone === 0)
         .map(kickBoard => {
-          const { marker, listener } = createKickBoardMarkerData(
+          const { marker, listeners } = createKickBoardMarkerData(
             kickBoard,
+            (id, lat, lng) => {
+              checkKickBoardMove(id, lat, lng).then(res => {
+                if (
+                  res.data.data ||
+                  window.confirm(
+                    '해당 구역은 금지 구역입니다. 그래도 반납하시겠습니까?',
+                  )
+                ) {
+                  dispatch(
+                    kickBoardActions.returnKickBoardMove({ id, lat, lng }),
+                  );
+                } else {
+                  marker.setPosition({
+                    lat: kickBoard.lat,
+                    lng: kickBoard.lng,
+                  });
+                }
+              });
+            },
             () => {
               setSelectedRedKickBoard(kickBoard);
             },
@@ -47,12 +63,10 @@ export default function useRedKickBoards(
               : isVisible,
           );
 
-          if (listener) {
-            if (!listenersRef.current) {
-              listenersRef.current = [];
-            }
-            listenersRef.current.push(listener);
+          if (!listenersRef.current) {
+            listenersRef.current = [];
           }
+          listenersRef.current.push(...listeners);
 
           return marker;
         });
@@ -66,7 +80,7 @@ export default function useRedKickBoards(
         naver.maps.Event.removeListener(listener);
       });
     };
-  }, [isVisible, kickBoards, mapRef, selectedRedKickBoard]);
+  }, [dispatch, isVisible, kickBoards, mapRef, selectedRedKickBoard]);
 
   return { selectedRedKickBoard, resetSelectedRedKickBoard };
 }
