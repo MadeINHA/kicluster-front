@@ -282,6 +282,8 @@ export function MainPage() {
         >
           {selectedRedKickBoard ? (
             <TopButton
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 30 }}
               onClick={() => {
                 dispatch(areaActions.setNearestArea(null));
                 resetSelectedRedKickBoard();
@@ -298,6 +300,8 @@ export function MainPage() {
           ) : !kickBoardVisibility.kickBoard &&
             kickBoardVisibility.redKickBoard ? (
             <TopButton
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 30 }}
               onClick={() => {
                 setKickBoardVisibility({ kickBoard: true, redKickBoard: true });
               }}
@@ -306,6 +310,8 @@ export function MainPage() {
             </TopButton>
           ) : (
             <TopButton
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 30 }}
               onClick={() => {
                 setKickBoardVisibility(({ kickBoard }) => ({
                   kickBoard: !kickBoard,

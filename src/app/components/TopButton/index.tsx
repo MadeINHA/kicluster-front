@@ -1,6 +1,7 @@
+import { motion } from 'motion/react';
 import styled from 'styled-components/macro';
 
-const TopButton = styled.div`
+const TopButton = styled(motion.div)`
   padding: 4px 16px;
   background-color: #ffffff;
   border-radius: 18px;
@@ -8,6 +9,7 @@ const TopButton = styled.div`
   color: #515151;
   font-size: 14px;
   font-weight: 500;
+  transition: 0.2s;
 `;
 
 export default TopButton;
