@@ -44,6 +44,7 @@ export function MainPage() {
   });
   const [isRawSelection, setIsRawSelection] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('');
+  const [isRefreshDisabled, setIsRefreshDisabled] = useState(false);
   // const [isTowFailureStackVisible, setIsTowFailureStackVisible] =
   //   useState(false);
 
@@ -242,6 +243,17 @@ export function MainPage() {
     };
   }, [notificationMessage]);
 
+  useEffect(() => {
+    if (!isRefreshDisabled) return;
+    const timeout = setTimeout(() => {
+      setIsRefreshDisabled(false);
+    }, 1000);
+
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [isRefreshDisabled]);
+
   return (
     <>
       <Helmet>
@@ -338,41 +350,31 @@ export function MainPage() {
             flexDirection: 'column',
             rowGap: '12px',
             position: 'absolute',
-            bottom: 'calc(99px + env(safe-area-inset-bottom))',
+            bottom: 'calc(64px + env(safe-area-inset-bottom))',
             right: 'env(safe-area-inset-right)',
-            padding: '24px',
+            padding: '0 16px',
           }}
         >
           <IconButton
-            whileTap={{ scale: 0.95, backgroundColor: '#6a26ff' }}
+            whileTap={{ scale: 0.95, backgroundColor: '#04D9C4' }}
             transition={{ type: 'spring', stiffness: 400, damping: 30 }}
             onClick={() => {
+              if (isRefreshDisabled) return;
+              setIsRefreshDisabled(true);
               getDynamicData();
             }}
           >
             <svg
+              width="28"
+              height="28"
+              viewBox="0 0 28 28"
+              fill="none"
               xmlns="http://www.w3.org/2000/svg"
-              height="24px"
-              viewBox="0 -960 960 960"
-              width="24px"
             >
-              <path d="M480-160q-134 0-227-93t-93-227q0-134 93-227t227-93q69 0 132 28.5T720-690v-110h80v280H520v-80h168q-32-56-87.5-88T480-720q-100 0-170 70t-70 170q0 100 70 170t170 70q77 0 139-44t87-116h84q-28 106-114 173t-196 67Z" />
-            </svg>
-          </IconButton>
-          <IconButton
-            whileTap={{ scale: 0.95, backgroundColor: '#6a26ff' }}
-            transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-            onClick={() => {
-              goToMyLocation();
-            }}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              height="24px"
-              viewBox="0 -960 960 960"
-              width="24px"
-            >
-              <path d="M440-42v-80q-125-14-214.5-103.5T122-440H42v-80h80q14-125 103.5-214.5T440-838v-80h80v80q125 14 214.5 103.5T838-520h80v80h-80q-14 125-103.5 214.5T520-122v80h-80Zm40-158q116 0 198-82t82-198q0-116-82-198t-198-82q-116 0-198 82t-82 198q0 116 82 198t198 82Zm0-120q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47Z" />
+              <path
+                d="M14.0449 22.75C11.6021 22.75 9.53313 21.9025 7.83796 20.2075C6.1426 18.5126 5.29492 16.444 5.29492 14.0017C5.29492 11.5595 6.1426 9.49035 7.83796 7.79421C9.53313 6.09807 11.6021 5.25 14.0449 5.25C15.4089 5.25 16.6998 5.55324 17.9174 6.15971C19.1348 6.76638 20.1474 7.62232 20.9551 8.72754V6.125C20.9551 5.87708 21.039 5.66932 21.2068 5.50171C21.3746 5.3339 21.5825 5.25 21.8304 5.25C22.0785 5.25 22.2863 5.3339 22.4537 5.50171C22.6213 5.66932 22.7051 5.87708 22.7051 6.125V11.3301C22.7051 11.6289 22.6041 11.8794 22.402 12.0814C22.1998 12.2834 21.9494 12.3845 21.6507 12.3845H16.4456C16.1977 12.3845 15.9899 12.3007 15.822 12.133C15.6544 11.9652 15.5706 11.7573 15.5706 11.5092C15.5706 11.2612 15.6544 11.0535 15.822 10.8859C15.9899 10.7185 16.1977 10.6347 16.4456 10.6347H20.179C19.5641 9.50833 18.7115 8.62099 17.621 7.97271C16.5308 7.32424 15.3388 7 14.0449 7C12.1005 7 10.4477 7.68056 9.08659 9.04167C7.72548 10.4028 7.04492 12.0556 7.04492 14C7.04492 15.9444 7.72548 17.5972 9.08659 18.9583C10.4477 20.3194 12.1005 21 14.0449 21C15.4008 21 16.642 20.644 17.7686 19.9319C18.8952 19.2201 19.7488 18.2703 20.3292 17.0826C20.4398 16.8703 20.6025 16.7218 20.8171 16.6373C21.0318 16.5529 21.2505 16.548 21.4734 16.6227C21.7112 16.6975 21.8776 16.8531 21.9727 17.0893C22.0676 17.3258 22.0597 17.5502 21.9491 17.7625C21.2265 19.2731 20.16 20.482 18.7495 21.3891C17.339 22.2964 15.7708 22.75 14.0449 22.75Z"
+                fill="#515151"
+              />
             </svg>
           </IconButton>
         </div>
@@ -588,13 +590,13 @@ const Map = styled.div`
 `;
 
 const Button = styled(motion.div)`
-  box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.16);
-  color: #12052e;
+  box-shadow: 0px 5px 7.5px 0px rgba(0, 0, 0, 0.2);
+  color: #515151;
   font-size: 18px;
   text-align: center;
 
   & > svg {
-    fill: #12052e;
+    fill: #515151;
   }
 `;
 
