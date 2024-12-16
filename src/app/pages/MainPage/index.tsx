@@ -511,7 +511,7 @@ export function MainPage() {
                             selectedRedKickBoard?.lng ?? 0,
                             nearestArea.center.lat,
                             nearestArea.center.lng,
-                          ) * 2,
+                          ) * 24,
                         ) + 1}
                         분
                       </div>
