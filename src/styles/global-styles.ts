@@ -1,29 +1,24 @@
 import { createGlobalStyle } from 'styled-components';
 
 export const GlobalStyle = createGlobalStyle`
-  @font-face {
-    font-family: 'Noto Sans KR';
-    src: local('Noto Sans KR'), url(${require('../resources/fonts/NotoSansKR.ttf')});
-  }
-
-  html {
-    width: 100%;
+  html,
+  body {
     height: 100%;
-    min-height: calc(100% + env(safe-area-inset-top));
-    overflow-x: hidden;
+    width: 100%;
   }
 
   body {
-    width: 100vw;
-    height: 100%;
-    font-family: 'Noto Sans KR', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    user-select: none;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   }
 
   #root {
-    min-width: 100%;
     height: 100%;
     min-height: 100%;
+    min-width: 100%;
+  }
+
+  #root > div:first-child {
+    height: 100%;
   }
 
   p,

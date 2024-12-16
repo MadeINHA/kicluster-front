@@ -31,6 +31,3 @@ generated-cra-app
 .cra-template-rb
 template
 .eslintcache
-
-config.json
-.vercel

@@ -6,28 +6,18 @@
  * contain code that should be seen on all pages. (e.g. navigation bar)
  */
 
+import * as React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 import { GlobalStyle } from 'styles/global-styles';
 
+import { HomePage } from './pages/HomePage/Loadable';
+import { NotFoundPage } from './components/NotFoundPage/Loadable';
 import { useTranslation } from 'react-i18next';
-import { MainPage } from './pages/MainPage/Loadable';
-import { NotFoundPage } from './pages/NotFoundPage/Loadable';
-import { useKickBoardSlice } from 'slices/kickBoard';
-import { useGlobalSlice } from 'slices/global';
-import { useAreaSlice } from 'slices/area';
-import useNaverMaps from 'hooks/useNaverMaps';
 
 export function App() {
-  useGlobalSlice();
-  useKickBoardSlice();
-  useAreaSlice();
-
-  useNaverMaps();
-
   const { i18n } = useTranslation();
-
   return (
     <BrowserRouter>
       <Helmet
@@ -39,7 +29,7 @@ export function App() {
       </Helmet>
 
       <Routes>
-        <Route path="/" element={<MainPage />} />
+        <Route path="/" element={<HomePage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
       <GlobalStyle />

@@ -1,0 +1,29 @@
+{
+  "max_cluster": 3,
+  "result": [
+    {
+      "clusterId": 1,
+      "coordinateList": [
+        { "latitude": 37.449147, "longitude": 126.652141 },
+        { "latitude": 37.449285, "longitude": 126.652225 },
+        { "latitude": 37.449069, "longitude": 126.652336 }
+      ]
+    },
+    {
+      "clusterId": 2,
+      "coordinateList": [
+        { "latitude": 37.44751, "longitude": 126.657949 },
+        { "latitude": 37.447627, "longitude": 126.657016 },
+        { "latitude": 37.447038, "longitude": 126.65713 }
+      ]
+    },
+    {
+      "clusterId": 3,
+      "coordinateList": [
+        { "latitude": 37.443725, "longitude": 126.657169 },
+        { "latitude": 37.443847, "longitude": 126.657241 },
+        { "latitude": 37.443058, "longitude": 126.657352 }
+      ]
+    }
+  ]
+}

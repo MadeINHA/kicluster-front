@@ -1,6 +1,3 @@
-import { GlobalState } from 'slices/global/types';
-import { KickBoardState } from 'slices/kickBoard/types';
-import { AreaState } from 'slices/area/types';
 // [IMPORT NEW CONTAINERSTATE ABOVE] < Needed for generating containers seamlessly
 
 /* 
@@ -8,8 +5,5 @@ import { AreaState } from 'slices/area/types';
   You have to declare them here manually
 */
 export interface RootState {
-  global?: GlobalState;
-  kickBoard?: KickBoardState;
-  area?: AreaState;
   // [INSERT NEW REDUCER KEY ABOVE] < Needed for generating containers seamlessly
 }
