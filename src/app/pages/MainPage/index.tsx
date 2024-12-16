@@ -274,7 +274,7 @@ export function MainPage() {
             position: 'absolute',
             top: notificationMessage
               ? 'calc(env(safe-area-inset-top) + 16px + 48px + 32px)'
-              : '16px',
+              : 'calc(env(safe-area-inset-top) + 16px)',
             left: 'env(safe-area-inset-left)',
             padding: '0 16px',
             transition: 'top 0.2s',
