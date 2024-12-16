@@ -31,7 +31,6 @@ export function MainPage() {
 
   const polylineRef = useRef<null | naver.maps.Polyline>(null);
 
-  const [isNotificationVisible, setIsNotificationVisible] = useState(false);
   const [isTowing, setIsTowing] = useState(false);
   const [timer, setTimer] = useState(0);
   const [isLoadingScreenVisible, setIsLoadingScreenVisible] = useState(false);
