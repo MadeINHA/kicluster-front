@@ -96,6 +96,7 @@ export function MainPage() {
           strokeWeight: 5,
           strokeLineJoin: 'round',
           strokeLineCap: 'round',
+          zIndex: 1,
         });
       }
       polylineRef.current.setPath([
@@ -289,6 +290,7 @@ export function MainPage() {
                   redKickBoard: true,
                 });
                 setIsRawSelection(false);
+                setIsAreasVisible(true);
               }}
             >
               돌아가기
