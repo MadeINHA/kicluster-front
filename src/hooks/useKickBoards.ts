@@ -28,8 +28,8 @@ export default function useKickBoards(
         .map(kickBoard => {
           const { marker, listeners } = createKickBoardMarkerData(
             kickBoard,
-            (id, lat, lng) => {
-              checkKickBoardMove(id, lat, lng).then(res => {
+            (lat, lng) => {
+              checkKickBoardMove(kickBoard.kickboardId, lat, lng).then(res => {
                 if (
                   res.data.data ||
                   window.confirm(
@@ -37,7 +37,11 @@ export default function useKickBoards(
                   )
                 ) {
                   dispatch(
-                    kickBoardActions.returnKickBoardMove({ id, lat, lng }),
+                    kickBoardActions.returnKickBoardMove({
+                      id: kickBoard.kickboardId,
+                      lat,
+                      lng,
+                    }),
                   );
                 } else {
                   marker.setPosition({

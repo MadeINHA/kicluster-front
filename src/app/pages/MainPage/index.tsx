@@ -19,6 +19,9 @@ import TowSuccessScreen from 'app/components/TowSuccessScreen';
 import TopButton from 'app/components/TopButton';
 import { config } from 'config';
 import getDistance from 'utils/getDistance';
+import { kickBoardActions } from 'slices/kickBoard';
+import { checkKickBoardsTow } from 'api/kickBoard';
+import TowFailureScreen from 'app/components/TowFailureScreen';
 
 // const UPDATE_TIME_INTERVAL = 30000;
 
@@ -36,6 +39,8 @@ export function MainPage() {
   const [isLoadingScreenVisible, setIsLoadingScreenVisible] = useState(false);
   const [isTowSuccessStackVisible, setIsTowSuccessStackVisible] =
     useState(false);
+  const [isTowFailureStackVisible, setIsTowFailureStackVisible] =
+    useState(false);
   const [isAreasVisible, setIsAreasVisible] = useState(true);
   const [distance, setDistance] = useState(21);
   const [kickBoardVisibility, setKickBoardVisibility] = useState({
@@ -45,8 +50,11 @@ export function MainPage() {
   const [isRawSelection, setIsRawSelection] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('');
   const [isRefreshDisabled, setIsRefreshDisabled] = useState(false);
-  // const [isTowFailureStackVisible, setIsTowFailureStackVisible] =
-  //   useState(false);
+  const [temp, setTemp] = useState<null | {
+    id: number;
+    lat: number;
+    lng: number;
+  }>(null);
 
   const { mapRef } = useMap();
   useRecommendedAreas(mapRef, isAreasVisible);
@@ -57,6 +65,7 @@ export function MainPage() {
   const { selectedRedKickBoard, resetSelectedRedKickBoard } = useRedKickBoards(
     mapRef,
     kickBoardVisibility.redKickBoard,
+    setTemp,
   );
 
   const readyForTow = () => {
@@ -128,68 +137,119 @@ export function MainPage() {
   }, [mapRef, nearestArea, selectedRedKickBoard]);
 
   const startTow = () => {
-    if (!selectedRedKickBoard) return;
+    if (!selectedRedKickBoard || !nearestArea) return;
     setIsLoadingScreenVisible(true);
-    // dispatch(
-    //   kickBoardActions.lentKickBoard({
-    //     kickBoardId: selectedKickBoardData.kickBoard.kickboardId,
-    //     path: [...nearestArea.path, nearestArea.path[0]],
-    //   }),
-    // );
-
-    setTimeout(() => {
-      setIsAreasVisible(true);
-      setIsTowing(true);
-      setTimer(120);
-      // mapRef.current?.setZoom(18, true);
-      mapRef.current?.setOptions('draggable', false);
-      mapRef.current?.setOptions('maxZoom', 18);
-      mapRef.current?.setOptions('minZoom', 18);
-      mapRef.current?.setCenter({
-        lat: selectedRedKickBoard.lat ?? 0,
-        lng: selectedRedKickBoard.lng ?? 0,
-      });
-      setIsLoadingScreenVisible(false);
-      // const a = {
-      //   lat: (
-      //     selectedKickBoardData.marker.getPosition() as naver.maps.LatLng
-      //   ).lat(),
-      //   lng: (
-      //     selectedKickBoardData.marker.getPosition() as naver.maps.LatLng
-      //   ).lng(),
-      // };
-      // const b = [37.450535283273815, 126.65425341704302];
-      // let c = 1;
-      setDistance(21);
-      // setInterval(() => {
-      //   if (c === 6) return;
-      //   selectedKickBoardData.marker.setPosition({
-      //     lat: a.lat + ((b[0] - a.lat) / 5) * c,
-      //     lng: a.lng - ((a.lng - b[1]) / 5) * c,
-      //   });
-      //   mapRef.current?.setCenter({
-      //     lat: a.lat + ((b[0] - a.lat) / 5) * c,
-      //     lng: a.lng - ((a.lng - b[1]) / 5) * c,
-      //   });
-      //   polylineRef.current?.setPath([
-      //     {
-      //       lat: a.lat + ((b[0] - a.lat) / 5) * c,
-      //       lng: a.lng - ((a.lng - b[1]) / 5) * c,
-      //     },
-      //     { lat: b[0], lng: b[1] },
-      //   ]);
-      //   c++;
-      // }, 700);
-    }, 2134);
+    dispatch(
+      kickBoardActions.lentKickBoardsTow({
+        kickBoardId: selectedRedKickBoard.kickboardId,
+        path: [...nearestArea.path, nearestArea.path[0]],
+        callback() {
+          setIsLoadingScreenVisible(false);
+          setIsAreasVisible(true);
+          setIsTowing(true);
+          setTimer(
+            (Math.floor(
+              getDistance(
+                selectedRedKickBoard?.lat ?? 0,
+                selectedRedKickBoard?.lng ?? 0,
+                nearestArea.center.lat,
+                nearestArea.center.lng,
+              ) * 24,
+            ) +
+              1) *
+              60,
+          );
+          // mapRef.current?.setZoom(18, true);
+          // mapRef.current?.setOptions('draggable', false);
+          // mapRef.current?.setOptions('maxZoom', 18);
+          // mapRef.current?.setOptions('minZoom', 18);
+          mapRef.current?.setCenter({
+            lat: selectedRedKickBoard.lat ?? 0,
+            lng: selectedRedKickBoard.lng ?? 0,
+          });
+          // const a = {
+          //   lat: selectedRedKickBoard.lat,
+          //   lng: selectedRedKickBoard.lng,
+          // };
+          // const b = {
+          //   lat: nearestArea.center.lat,
+          //   lng: nearestArea.center.lng,
+          // };
+          // let c = 1;
+          // setDistance(
+          //   Math.floor(
+          //     getDistance(
+          //       selectedRedKickBoard?.lat ?? 0,
+          //       selectedRedKickBoard?.lng ?? 0,
+          //       nearestArea.center.lat,
+          //       nearestArea.center.lng,
+          //     ) * 1000,
+          //   ),
+          // );
+          // setInterval(() => {
+          //   if (c === 6) return;
+          //   selectedKickBoardData.marker.setPosition({
+          //     lat: a.lat + ((b[0] - a.lat) / 5) * c,
+          //     lng: a.lng - ((a.lng - b[1]) / 5) * c,
+          //   });
+          //   mapRef.current?.setCenter({
+          //     lat: a.lat + ((b[0] - a.lat) / 5) * c,
+          //     lng: a.lng - ((a.lng - b[1]) / 5) * c,
+          //   });
+          //   polylineRef.current?.setPath([
+          //     {
+          //       lat: a.lat + ((b[0] - a.lat) / 5) * c,
+          //       lng: a.lng - ((a.lng - b[1]) / 5) * c,
+          //     },
+          //     { lat: b[0], lng: b[1] },
+          //   ]);
+          //   c++;
+          // }, 700);
+        },
+      }),
+    );
   };
 
   const endTow = () => {
+    if (!selectedRedKickBoard) return;
     setIsLoadingScreenVisible(true);
-    // axiosInstance.get();
-    setTimeout(() => {
-      setIsTowSuccessStackVisible(true);
-      setIsLoadingScreenVisible(false);
-    }, 1432);
+    checkKickBoardsTow(
+      selectedRedKickBoard.kickboardId,
+      temp?.lat ?? selectedRedKickBoard.lat,
+      temp?.lng ?? selectedRedKickBoard.lng,
+    ).then(res => {
+      if (res.data.data) {
+        dispatch(
+          kickBoardActions.returnKickBoardsTow({
+            id: selectedRedKickBoard.kickboardId,
+            lat: temp?.lat ?? selectedRedKickBoard.lat,
+            lng: temp?.lng ?? selectedRedKickBoard.lng,
+            callback() {
+              setIsTowSuccessStackVisible(true);
+              setIsLoadingScreenVisible(false);
+            },
+          }),
+        );
+      } else if (
+        window.confirm(
+          '해당 구역은 목표 구역이 아닙니다. 그래도 반납하시겠습니까?',
+        )
+      ) {
+        dispatch(
+          kickBoardActions.returnKickBoardsTow({
+            id: selectedRedKickBoard.kickboardId,
+            lat: temp?.lat ?? selectedRedKickBoard.lat,
+            lng: temp?.lng ?? selectedRedKickBoard.lng,
+            callback() {
+              setIsTowFailureStackVisible(true);
+              setIsLoadingScreenVisible(false);
+            },
+          }),
+        );
+      } else {
+        setIsLoadingScreenVisible(false);
+      }
+    });
   };
 
   useEffect(() => {
@@ -267,13 +327,20 @@ export function MainPage() {
         <TowSuccessScreen
           isVisible={isTowSuccessStackVisible}
           onButtonClick={() => {
-            mapRef.current?.setOptions('draggable', true);
-            mapRef.current?.setOptions('maxZoom', undefined);
-            mapRef.current?.setOptions('minZoom', undefined);
-            setIsTowSuccessStackVisible(false);
-            resetSelectedRedKickBoard();
-            setKickBoardVisibility({ kickBoard: true, redKickBoard: true });
-            dispatch(areaActions.setNearestArea(null));
+            window.location.reload();
+            // mapRef.current?.setOptions('draggable', true);
+            // mapRef.current?.setOptions('maxZoom', undefined);
+            // mapRef.current?.setOptions('minZoom', undefined);
+            // setIsTowSuccessStackVisible(false);
+            // resetSelectedRedKickBoard();
+            // setKickBoardVisibility({ kickBoard: true, redKickBoard: true });
+            // dispatch(areaActions.setNearestArea(null));
+          }}
+        />
+        <TowFailureScreen
+          isVisible={isTowFailureStackVisible}
+          onButtonClick={() => {
+            window.location.reload();
           }}
         />
         <Notification
@@ -458,7 +525,7 @@ export function MainPage() {
                     </div>
                   </div>
                   <BottomButton
-                    whileTap={{ scale: 0.95, backgroundColor: '#6a26ff' }}
+                    whileTap={{ scale: 0.95, backgroundColor: '#00BBA9' }}
                     transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                     onClick={() => {
                       endTow();
@@ -538,7 +605,7 @@ export function MainPage() {
                     </div>
                   </div>
                   <BottomButton
-                    whileTap={{ scale: 0.95, backgroundColor: '#6a26ff' }}
+                    whileTap={{ scale: 0.95, backgroundColor: '#00BBA9' }}
                     transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                     onClick={() => {
                       startTow();
