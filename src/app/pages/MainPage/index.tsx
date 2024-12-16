@@ -176,16 +176,16 @@ export function MainPage() {
           //   lng: nearestArea.center.lng,
           // };
           // let c = 1;
-          // setDistance(
-          //   Math.floor(
-          //     getDistance(
-          //       selectedRedKickBoard?.lat ?? 0,
-          //       selectedRedKickBoard?.lng ?? 0,
-          //       nearestArea.center.lat,
-          //       nearestArea.center.lng,
-          //     ) * 1000,
-          //   ),
-          // );
+          setDistance(
+            Math.floor(
+              getDistance(
+                selectedRedKickBoard?.lat ?? 0,
+                selectedRedKickBoard?.lng ?? 0,
+                nearestArea.center.lat,
+                nearestArea.center.lng,
+              ) * 1000,
+            ),
+          );
           // setInterval(() => {
           //   if (c === 6) return;
           //   selectedKickBoardData.marker.setPosition({
@@ -253,6 +253,7 @@ export function MainPage() {
   };
 
   useEffect(() => {
+    if (!timer) return;
     const interval = setInterval(() => {
       setTimer(timer => timer - 1);
     }, 1000);
@@ -261,19 +262,6 @@ export function MainPage() {
       clearInterval(interval);
     };
   }, [timer]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (distance < 4) {
-        return;
-      }
-      setDistance(timer => timer - 4);
-    }, 700);
-
-    return () => {
-      clearInterval(interval);
-    };
-  }, [distance]);
 
   useEffect(() => {
     const deviceId =
@@ -360,7 +348,7 @@ export function MainPage() {
             transition: 'top 0.2s',
           }}
         >
-          {selectedRedKickBoard ? (
+          {isTowing ? null : selectedRedKickBoard ? (
             <TopButton
               whileTap={{ scale: 0.95 }}
               transition={{ type: 'spring', stiffness: 400, damping: 30 }}
@@ -418,9 +406,10 @@ export function MainPage() {
             flexDirection: 'column',
             rowGap: '12px',
             position: 'absolute',
-            bottom: 'calc(64px + env(safe-area-inset-bottom))',
+            bottom: 'calc(64px + 32px + env(safe-area-inset-bottom))',
             right: 'env(safe-area-inset-right)',
             padding: '0 16px',
+            zIndex: nearestArea ? 0 : 1,
           }}
         >
           <IconButton
@@ -446,204 +435,215 @@ export function MainPage() {
             </svg>
           </IconButton>
         </div>
-        {
-          nearestArea ? (
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                rowGap: '16px',
-                position: 'absolute',
-                bottom: 'calc(0px - env(safe-area-inset-bottom))',
-                width: '100%',
-                padding:
-                  '16px 16px calc(env(safe-area-inset-bottom) + 32px) 16px',
-                backgroundColor: '#ffffff',
-                borderRadius: '12px 12px 0 0',
-                boxShadow: '0px 0px 30px 0px rgba(0, 0, 0, 0.2)',
-              }}
-            >
-              {isTowing ? (
-                <>
+        {nearestArea ? (
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              rowGap: '16px',
+              position: 'absolute',
+              bottom: 'calc(0px - env(safe-area-inset-bottom))',
+              width: '100%',
+              padding:
+                '16px 16px calc(env(safe-area-inset-bottom) + 32px) 16px',
+              backgroundColor: '#ffffff',
+              borderRadius: '12px 12px 0 0',
+              boxShadow: '0px 0px 30px 0px rgba(0, 0, 0, 0.2)',
+            }}
+          >
+            {isTowing ? (
+              <>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    columnGap: '16px',
+                    padding: '16px 32px',
+                    backgroundColor: '#eeeeee',
+                    borderRadius: '12px',
+                  }}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    height="24px"
+                    viewBox="0 -960 960 960"
+                    width="24px"
+                    fill="#515151"
+                  >
+                    <path d="M380-380v180q0 24.54-17.54 42.27Q344.92-140 320-140q-24.54 0-42.27-17.73Q260-175.46 260-200v-560q0-24.54 17.73-42.27Q295.46-820 320-820h200q91.15 0 155.58 64.42Q740-691.15 740-600t-64.42 155.58Q611.15-380 520-380H380Zm0-120h144.92q41.08 0 70.54-29.46 29.46-29.46 29.46-70.54 0-41.08-29.46-70.54Q566-700 524.92-700H380v200Z" />
+                  </svg>
+                  <div>
+                    {nearestArea.name === '새로운 주차 구역'
+                      ? '임시 주차 구역'
+                      : nearestArea.name}
+                  </div>
+                </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-evenly',
+                    padding: '16px 0',
+                  }}
+                >
                   <div
                     style={{
                       display: 'flex',
+                      flexDirection: 'column',
                       alignItems: 'center',
-                      columnGap: '16px',
-                      padding: '16px 32px',
-                      backgroundColor: '#eeeeee',
-                      borderRadius: '12px',
                     }}
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      height="24px"
-                      viewBox="0 -960 960 960"
-                      width="24px"
-                      fill="#515151"
-                    >
-                      <path d="M380-380v180q0 24.54-17.54 42.27Q344.92-140 320-140q-24.54 0-42.27-17.73Q260-175.46 260-200v-560q0-24.54 17.73-42.27Q295.46-820 320-820h200q91.15 0 155.58 64.42Q740-691.15 740-600t-64.42 155.58Q611.15-380 520-380H380Zm0-120h144.92q41.08 0 70.54-29.46 29.46-29.46 29.46-70.54 0-41.08-29.46-70.54Q566-700 524.92-700H380v200Z" />
-                    </svg>
+                    <div>남은 시간</div>
+                    <div>
+                      {Math.floor(timer / 60) === 0
+                        ? timer
+                        : `${Math.floor(timer / 60)}:${`0${timer % 60}`.slice(
+                            -2,
+                          )}`}
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <div>남은 거리</div>
+                    <div>{distance}m</div>
+                  </div>
+                </div>
+                <BottomButton
+                  whileTap={{ scale: 0.95, backgroundColor: '#00BBA9' }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                  onClick={() => {
+                    endTow();
+                  }}
+                >
+                  견인 종료하기
+                </BottomButton>
+              </>
+            ) : (
+              <>
+                <div style={{ textAlign: 'center', fontWeight: 500 }}>
+                  목표 주차 권장 구역
+                </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    columnGap: '16px',
+                    padding: '16px 32px',
+                    backgroundColor: '#eeeeee',
+                    borderRadius: '12px',
+                  }}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    height="24px"
+                    viewBox="0 -960 960 960"
+                    width="24px"
+                    fill="#515151"
+                  >
+                    <path d="M380-380v180q0 24.54-17.54 42.27Q344.92-140 320-140q-24.54 0-42.27-17.73Q260-175.46 260-200v-560q0-24.54 17.73-42.27Q295.46-820 320-820h200q91.15 0 155.58 64.42Q740-691.15 740-600t-64.42 155.58Q611.15-380 520-380H380Zm0-120h144.92q41.08 0 70.54-29.46 29.46-29.46 29.46-70.54 0-41.08-29.46-70.54Q566-700 524.92-700H380v200Z" />
+                  </svg>
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      rowGap: '8px',
+                    }}
+                  >
                     <div>
                       {nearestArea.name === '새로운 주차 구역'
                         ? '임시 주차 구역'
                         : nearestArea.name}
                     </div>
-                  </div>
-                  <div
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-evenly',
-                      padding: '16px 0',
-                    }}
-                  >
                     <div
                       style={{
                         display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                      }}
-                    >
-                      <div>남은 시간</div>
-                      <div>
-                        {Math.floor(timer / 60) === 0
-                          ? timer
-                          : `${Math.floor(timer / 60)}:${`0${timer % 60}`.slice(
-                              -2,
-                            )}`}
-                      </div>
-                    </div>
-                    <div
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                      }}
-                    >
-                      <div>남은 거리</div>
-                      <div>{distance}m</div>
-                    </div>
-                  </div>
-                  <BottomButton
-                    whileTap={{ scale: 0.95, backgroundColor: '#00BBA9' }}
-                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                    onClick={() => {
-                      endTow();
-                    }}
-                  >
-                    견인 종료하기
-                  </BottomButton>
-                </>
-              ) : (
-                <>
-                  <div style={{ textAlign: 'center', fontWeight: 500 }}>
-                    목표 주차 권장 구역
-                  </div>
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      columnGap: '16px',
-                      padding: '16px 32px',
-                      backgroundColor: '#eeeeee',
-                      borderRadius: '12px',
-                    }}
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      height="24px"
-                      viewBox="0 -960 960 960"
-                      width="24px"
-                      fill="#515151"
-                    >
-                      <path d="M380-380v180q0 24.54-17.54 42.27Q344.92-140 320-140q-24.54 0-42.27-17.73Q260-175.46 260-200v-560q0-24.54 17.73-42.27Q295.46-820 320-820h200q91.15 0 155.58 64.42Q740-691.15 740-600t-64.42 155.58Q611.15-380 520-380H380Zm0-120h144.92q41.08 0 70.54-29.46 29.46-29.46 29.46-70.54 0-41.08-29.46-70.54Q566-700 524.92-700H380v200Z" />
-                    </svg>
-                    <div
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        rowGap: '8px',
+                        columnGap: '8px',
+                        fontSize: '12px',
                       }}
                     >
                       <div>
-                        {nearestArea.name === '새로운 주차 구역'
-                          ? '임시 주차 구역'
-                          : nearestArea.name}
+                        견인 거리{' '}
+                        {Math.floor(
+                          getDistance(
+                            selectedRedKickBoard?.lat ?? 0,
+                            selectedRedKickBoard?.lng ?? 0,
+                            nearestArea.center.lat,
+                            nearestArea.center.lng,
+                          ) * 1000,
+                        )}
+                        m
                       </div>
-                      <div
-                        style={{
-                          display: 'flex',
-                          columnGap: '8px',
-                          fontSize: '12px',
-                        }}
-                      >
-                        <div>
-                          견인 거리{' '}
-                          {Math.floor(
-                            getDistance(
-                              selectedRedKickBoard?.lat ?? 0,
-                              selectedRedKickBoard?.lng ?? 0,
-                              nearestArea.center.lat,
-                              nearestArea.center.lng,
-                            ) * 1000,
-                          )}
-                          m
-                        </div>
-                        <div>
-                          견인 시간{' '}
-                          {Math.floor(
-                            getDistance(
-                              selectedRedKickBoard?.lat ?? 0,
-                              selectedRedKickBoard?.lng ?? 0,
-                              nearestArea.center.lat,
-                              nearestArea.center.lng,
-                            ) * 24,
-                          ) + 1}
-                          분
-                        </div>
+                      <div>
+                        견인 시간{' '}
+                        {Math.floor(
+                          getDistance(
+                            selectedRedKickBoard?.lat ?? 0,
+                            selectedRedKickBoard?.lng ?? 0,
+                            nearestArea.center.lat,
+                            nearestArea.center.lng,
+                          ) * 24,
+                        ) + 1}
+                        분
                       </div>
                     </div>
                   </div>
-                  <BottomButton
-                    whileTap={{ scale: 0.95, backgroundColor: '#00BBA9' }}
-                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                    onClick={() => {
-                      startTow();
-                    }}
-                  >
-                    견인 시작하기
-                  </BottomButton>
-                </>
-              )}
+                </div>
+                <BottomButton
+                  whileTap={{ scale: 0.95, backgroundColor: '#00BBA9' }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                  onClick={() => {
+                    startTow();
+                  }}
+                >
+                  견인 시작하기
+                </BottomButton>
+              </>
+            )}
+          </div>
+        ) : (
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-evenly',
+              position: 'absolute',
+              bottom: 'calc(0px - env(safe-area-inset-bottom))',
+              width: '100%',
+              padding:
+                '16px 16px calc(env(safe-area-inset-bottom) + 16px) 16px',
+              backgroundColor: '#04D9C4',
+              boxShadow: '0px 0px 30px 0px rgba(4, 217, 196, 0.2)',
+              fontWeight: 500,
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                columnGap: '8px',
+                width: '100%',
+                color: '#ffffff',
+              }}
+            >
+              <div>MadeINHA</div>
+              <div
+                style={{
+                  width: '36px',
+                  height: '36px',
+                  backgroundImage: `url(${require('../../../resources/images/bi-no-background.png')})`,
+                  backgroundPosition: 'center',
+                  backgroundRepeat: 'no-repeat',
+                  backgroundSize: 'contain',
+                }}
+              />
+              <div>Kicluster</div>
             </div>
-          ) : null
-          // <div
-          //   style={{
-          //     display: 'flex',
-          //     columnGap: '12px',
-          //     position: 'absolute',
-          //     bottom: 'env(safe-area-inset-bottom)',
-          //     width: '100%',
-          //     padding: '24px',
-          //     backgroundColor: '#ffffff',
-          //     borderRadius: '12px 12px 0 0',
-          //     boxShadow: '0px 1px 4px 0px rgba(0, 0, 0, 0.16)',
-          //   }}
-          // >
-          //   <BottomButton
-          //     whileTap={{ scale: 0.95, backgroundColor: '#6a26ff' }}
-          //     transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-          //   >
-          //     주행 모드
-          //   </BottomButton>
-          //   <BottomButton
-          //     whileTap={{ scale: 0.95, backgroundColor: '#6a26ff' }}
-          //     transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-          //   >
-          //     견인 모드
-          //   </BottomButton>
-          // </div>
-        }
+          </div>
+        )}
       </Container>
     </>
   );
