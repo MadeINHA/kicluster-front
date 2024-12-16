@@ -370,194 +370,195 @@ export function MainPage() {
             </svg>
           </IconButton>
         </div>
-        {nearestArea ? (
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              rowGap: '12px',
-              position: 'absolute',
-              bottom: 'env(safe-area-inset-bottom)',
-              width: '100%',
-              padding: '24px',
-              backgroundColor: '#ffffff',
-              borderRadius: '12px 12px 0 0',
-              boxShadow: '0px 1px 4px 0px rgba(0, 0, 0, 0.16)',
-            }}
-          >
-            {isTowing ? (
-              <>
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    columnGap: '16px',
-                    padding: '16px 32px',
-                    borderRadius: '12px',
-                    backgroundColor: '#f5f4f8',
-                  }}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    height="24px"
-                    viewBox="0 -960 960 960"
-                    width="24px"
-                    fill="#5f6368"
-                  >
-                    <path d="M240-120v-720h280q100 0 170 70t70 170q0 100-70 170t-170 70H400v240H240Zm160-400h128q33 0 56.5-23.5T608-600q0-33-23.5-56.5T528-680H400v160Z" />
-                  </svg>
-                  <div>{nearestArea.name}</div>
-                </div>
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-evenly',
-                    padding: '16px 0',
-                  }}
-                >
+        {
+          nearestArea ? (
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                rowGap: '12px',
+                position: 'absolute',
+                bottom: 'env(safe-area-inset-bottom)',
+                width: '100%',
+                padding: '24px',
+                backgroundColor: '#ffffff',
+                borderRadius: '12px 12px 0 0',
+                boxShadow: '0px 1px 4px 0px rgba(0, 0, 0, 0.16)',
+              }}
+            >
+              {isTowing ? (
+                <>
                   <div
                     style={{
                       display: 'flex',
-                      flexDirection: 'column',
                       alignItems: 'center',
+                      columnGap: '16px',
+                      padding: '16px 32px',
+                      borderRadius: '12px',
+                      backgroundColor: '#f5f4f8',
                     }}
                   >
-                    <div>남은 시간</div>
-                    <div>
-                      {Math.floor(timer / 60) === 0
-                        ? timer
-                        : `${Math.floor(timer / 60)}:${`0${timer % 60}`.slice(
-                            -2,
-                          )}`}
-                    </div>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      height="24px"
+                      viewBox="0 -960 960 960"
+                      width="24px"
+                      fill="#5f6368"
+                    >
+                      <path d="M240-120v-720h280q100 0 170 70t70 170q0 100-70 170t-170 70H400v240H240Zm160-400h128q33 0 56.5-23.5T608-600q0-33-23.5-56.5T528-680H400v160Z" />
+                    </svg>
+                    <div>{nearestArea.name}</div>
                   </div>
                   <div
                     style={{
                       display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
+                      justifyContent: 'space-evenly',
+                      padding: '16px 0',
                     }}
                   >
-                    <div>남은 거리</div>
-                    <div>{distance}m</div>
-                  </div>
-                </div>
-                <BottomButton
-                  whileTap={{ scale: 0.95, backgroundColor: '#6a26ff' }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                  onClick={() => {
-                    endTow();
-                  }}
-                >
-                  견인 종료하기
-                </BottomButton>
-              </>
-            ) : (
-              <>
-                <div style={{ fontSize: '12px', textAlign: 'center' }}>
-                  목표 주차 권장 구역
-                </div>
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    columnGap: '16px',
-                    padding: '16px 32px',
-                    borderRadius: '12px',
-                    backgroundColor: '#f5f4f8',
-                  }}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    height="24px"
-                    viewBox="0 -960 960 960"
-                    width="24px"
-                    fill="#5f6368"
-                  >
-                    <path d="M240-120v-720h280q100 0 170 70t70 170q0 100-70 170t-170 70H400v240H240Zm160-400h128q33 0 56.5-23.5T608-600q0-33-23.5-56.5T528-680H400v160Z" />
-                  </svg>
-                  <div
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      rowGap: '8px',
-                    }}
-                  >
-                    <div>임시 주차 구역</div>
                     <div
                       style={{
                         display: 'flex',
-                        columnGap: '8px',
-                        fontSize: '12px',
+                        flexDirection: 'column',
+                        alignItems: 'center',
                       }}
                     >
+                      <div>남은 시간</div>
                       <div>
-                        견인 거리{' '}
-                        {Math.floor(
-                          getDistance(
-                            selectedRedKickBoard?.lat ?? 0,
-                            selectedRedKickBoard?.lng ?? 0,
-                            nearestArea.center.lat,
-                            nearestArea.center.lng,
-                          ) * 1000,
-                        )}
-                        m
+                        {Math.floor(timer / 60) === 0
+                          ? timer
+                          : `${Math.floor(timer / 60)}:${`0${timer % 60}`.slice(
+                              -2,
+                            )}`}
                       </div>
-                      <div>
-                        견인 시간{' '}
-                        {Math.floor(
-                          getDistance(
-                            selectedRedKickBoard?.lat ?? 0,
-                            selectedRedKickBoard?.lng ?? 0,
-                            nearestArea.center.lat,
-                            nearestArea.center.lng,
-                          ) * 24,
-                        ) + 1}
-                        분
+                    </div>
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <div>남은 거리</div>
+                      <div>{distance}m</div>
+                    </div>
+                  </div>
+                  <BottomButton
+                    whileTap={{ scale: 0.95, backgroundColor: '#6a26ff' }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                    onClick={() => {
+                      endTow();
+                    }}
+                  >
+                    견인 종료하기
+                  </BottomButton>
+                </>
+              ) : (
+                <>
+                  <div style={{ fontSize: '12px', textAlign: 'center' }}>
+                    목표 주차 권장 구역
+                  </div>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      columnGap: '16px',
+                      padding: '16px 32px',
+                      borderRadius: '12px',
+                      backgroundColor: '#f5f4f8',
+                    }}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      height="24px"
+                      viewBox="0 -960 960 960"
+                      width="24px"
+                      fill="#5f6368"
+                    >
+                      <path d="M240-120v-720h280q100 0 170 70t70 170q0 100-70 170t-170 70H400v240H240Zm160-400h128q33 0 56.5-23.5T608-600q0-33-23.5-56.5T528-680H400v160Z" />
+                    </svg>
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        rowGap: '8px',
+                      }}
+                    >
+                      <div>임시 주차 구역</div>
+                      <div
+                        style={{
+                          display: 'flex',
+                          columnGap: '8px',
+                          fontSize: '12px',
+                        }}
+                      >
+                        <div>
+                          견인 거리{' '}
+                          {Math.floor(
+                            getDistance(
+                              selectedRedKickBoard?.lat ?? 0,
+                              selectedRedKickBoard?.lng ?? 0,
+                              nearestArea.center.lat,
+                              nearestArea.center.lng,
+                            ) * 1000,
+                          )}
+                          m
+                        </div>
+                        <div>
+                          견인 시간{' '}
+                          {Math.floor(
+                            getDistance(
+                              selectedRedKickBoard?.lat ?? 0,
+                              selectedRedKickBoard?.lng ?? 0,
+                              nearestArea.center.lat,
+                              nearestArea.center.lng,
+                            ) * 24,
+                          ) + 1}
+                          분
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-                <BottomButton
-                  whileTap={{ scale: 0.95, backgroundColor: '#6a26ff' }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                  onClick={() => {
-                    startTow();
-                  }}
-                >
-                  견인 시작하기
-                </BottomButton>
-              </>
-            )}
-          </div>
-        ) : (
-          <div
-            style={{
-              display: 'flex',
-              columnGap: '12px',
-              position: 'absolute',
-              bottom: 'env(safe-area-inset-bottom)',
-              width: '100%',
-              padding: '24px',
-              backgroundColor: '#ffffff',
-              borderRadius: '12px 12px 0 0',
-              boxShadow: '0px 1px 4px 0px rgba(0, 0, 0, 0.16)',
-            }}
-          >
-            <BottomButton
-              whileTap={{ scale: 0.95, backgroundColor: '#6a26ff' }}
-              transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-            >
-              주행 모드
-            </BottomButton>
-            <BottomButton
-              whileTap={{ scale: 0.95, backgroundColor: '#6a26ff' }}
-              transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-            >
-              견인 모드
-            </BottomButton>
-          </div>
-        )}
+                  <BottomButton
+                    whileTap={{ scale: 0.95, backgroundColor: '#6a26ff' }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                    onClick={() => {
+                      startTow();
+                    }}
+                  >
+                    견인 시작하기
+                  </BottomButton>
+                </>
+              )}
+            </div>
+          ) : null
+          // <div
+          //   style={{
+          //     display: 'flex',
+          //     columnGap: '12px',
+          //     position: 'absolute',
+          //     bottom: 'env(safe-area-inset-bottom)',
+          //     width: '100%',
+          //     padding: '24px',
+          //     backgroundColor: '#ffffff',
+          //     borderRadius: '12px 12px 0 0',
+          //     boxShadow: '0px 1px 4px 0px rgba(0, 0, 0, 0.16)',
+          //   }}
+          // >
+          //   <BottomButton
+          //     whileTap={{ scale: 0.95, backgroundColor: '#6a26ff' }}
+          //     transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+          //   >
+          //     주행 모드
+          //   </BottomButton>
+          //   <BottomButton
+          //     whileTap={{ scale: 0.95, backgroundColor: '#6a26ff' }}
+          //     transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+          //   >
+          //     견인 모드
+          //   </BottomButton>
+          // </div>
+        }
       </Container>
     </>
   );
