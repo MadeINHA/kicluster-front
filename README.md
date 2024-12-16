@@ -1,8 +1,9 @@
 # Kicluster-FE
-<img src="https://github.com/user-attachments/assets/dfdd36a0-f818-4a19-a910-0dd31def43e1" width=300 />
+<img src="https://github.com/user-attachments/assets/da61a81b-a337-4b61-a25d-4abd944f12c2" width=300 />
 <br/><br/>
 
 ## 사용한 라이브러리
+
 * React Boilerplate CRA Template
   * react@18.2.0
   * typescript@4.6.4
@@ -42,3 +43,8 @@ yarn start
 ```sh
 yarn build
 ```
+<br/>
+
+## 알고리즘 시각화 도구
+
+알고리즘 시각화 도구는 "visualization" 브랜치에서 개발되었습니다.
