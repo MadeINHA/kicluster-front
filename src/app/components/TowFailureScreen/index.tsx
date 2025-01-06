@@ -1,7 +1,7 @@
 import { motion } from 'motion/react';
 import styled from 'styled-components/macro';
 
-export default function TowSuccessScreen({
+export default function TowFailureScreen({
   isVisible,
   onButtonClick,
 }: {
@@ -34,26 +34,18 @@ export default function TowSuccessScreen({
         }}
       >
         <div style={{ fontSize: '24px', fontWeight: 500 }}>
-          견인이 완료되었습니다.
+          견인을 포기하였습니다.
         </div>
-        {isVisible ? (
-          <motion.div
-            animate={{
-              rotate: [-30, 0, -30, 0],
-            }}
-            transition={{
-              delay: 0.2,
-            }}
-            style={{
-              width: '72px',
-              height: '72px',
-              backgroundImage: `url(${require('../../../resources/images/party_popper.png')})`,
-              backgroundPosition: 'center',
-              backgroundRepeat: 'no-repeat',
-              backgroundSize: 'contain',
-            }}
-          />
-        ) : null}
+        <div
+          style={{
+            width: '72px',
+            height: '72px',
+            backgroundImage: `url(${require('../../../resources/images/crying_face.png')})`,
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            backgroundSize: 'contain',
+          }}
+        />
       </div>
 
       <TempButton

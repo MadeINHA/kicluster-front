@@ -24,6 +24,23 @@ const slice = createSlice({
         lng: number;
       }>,
     ) {},
+    lentKickBoardsTow(
+      _,
+      __: PayloadAction<{
+        kickBoardId: number;
+        path: { lat: number; lng: number }[];
+        callback(): void;
+      }>,
+    ) {},
+    returnKickBoardsTow(
+      _,
+      __: PayloadAction<{
+        id: number;
+        lat: number;
+        lng: number;
+        callback(): void;
+      }>,
+    ) {},
   },
 });
 

@@ -2,7 +2,9 @@ import { takeLatest, put, all, call } from 'redux-saga/effects';
 import { kickBoardActions } from '.';
 import {
   getKickBoards,
+  lentKickBoardsTow,
   returnKickBoardMove,
+  returnKickBoardsTow,
 } from 'api/kickBoard';
 import { areaActions } from 'slices/area';
 
@@ -24,11 +26,35 @@ function* getKickBoardsSaga() {
   } catch (error) {}
 }
 
+function* lentKickBoardsTowSaga({ payload }) {
+  try {
+    yield call(lentKickBoardsTow, payload.kickBoardId, payload.path);
+  } catch (error) {}
+
+  yield call(payload.callback);
+}
+
+function* returnKickBoardsTowSaga({ payload }) {
+  try {
+    const response = yield call(
+      returnKickBoardsTow,
+      payload.id,
+      payload.lat,
+      payload.lng,
+    );
+    console.log(response.data);
+  } catch (error) {}
+
+  yield call(payload.callback);
+}
+
 // Root saga
 export default function* kickBoardSaga() {
   // if necessary, start multiple sagas at once with `all`
   yield all([
     takeLatest(kickBoardActions.returnKickBoardMove, returnKickBoardMoveSaga),
     takeLatest(kickBoardActions.getKickBoards, getKickBoardsSaga),
+    takeLatest(kickBoardActions.lentKickBoardsTow, lentKickBoardsTowSaga),
+    takeLatest(kickBoardActions.returnKickBoardsTow, returnKickBoardsTowSaga),
   ]);
 }

@@ -18,11 +18,13 @@ export default function useMap() {
   const myLocationMarkerRef = useRef<null | naver.maps.Marker>(null);
 
   const goToMyLocation = () => {
+    console.log('finding my location...');
     navigator.geolocation.getCurrentPosition(geolocationPosition => {
       const position = {
         lat: geolocationPosition.coords.latitude,
         lng: geolocationPosition.coords.longitude,
       };
+      console.log('location found');
       mapRef.current?.setCenter(position);
     });
   };
@@ -33,7 +35,7 @@ export default function useMap() {
     mapRef.current = map;
     myLocationMarkerRef.current = new naver.maps.Marker({
       position: defaultCenter,
-      map,
+      // map,
       icon: {
         content:
           '<div style="display: flex;align-items: center;justify-content: center;width: 36px;height: 36px;background-color: #6a26ff40;border-radius: 50%;"><div style="width: 16px;height: 16px;background-color: #6a26ff;border: 2px solid #ffffff;border-radius: 50%;box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.16)"></div></div>',

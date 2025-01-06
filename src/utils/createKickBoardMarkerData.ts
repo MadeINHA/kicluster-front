@@ -22,7 +22,7 @@ export type KickBoardMarkerData = ReturnType<typeof createKickBoardMarkerData>;
 
 export function createKickBoardMarkerData(
   kickBoard: KickBoard,
-  onMove: (id: number, lat: number, lng: number) => void,
+  onMove: (lat: number, lng: number) => void,
   onClick?: () => void,
 ) {
   const color = kickBoard.parkingZone === 0 ? '#EF5B73' : '#00BBA9';
@@ -61,7 +61,6 @@ export function createKickBoardMarkerData(
       marker.setOptions('draggable', false);
       marker.setIcon(createColoredIcon(color));
       onMove(
-        kickBoard.kickboardId,
         (marker.getPosition() as naver.maps.LatLng).lat(),
         (marker.getPosition() as naver.maps.LatLng).lng(),
       );
