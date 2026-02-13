@@ -78,7 +78,7 @@ export function HomePage() {
     if (!document.getElementById('naverMapsScript')) {
       const naverMapsScript = document.createElement('script');
       naverMapsScript.id = 'naverMapsScript';
-      naverMapsScript.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${API_KEY}`;
+      naverMapsScript.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${API_KEY}`;
       naverMapsScript.onload = () => {
         const options: naver.maps.MapOptions = {
           center: new naver.maps.LatLng(37.4494317, 126.6548253),
